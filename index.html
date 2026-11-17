@@ -35,6 +35,10 @@ input[type=text],select{width:100%;padding:13px 14px;border:2px solid #ece8f4;bo
 input:focus,select:focus{outline:none;border-color:var(--brand)}
 .cwrap{display:flex;gap:10px;align-items:center}.cwrap select{flex:1}
 #flagPrev{width:52px;height:38px;object-fit:cover;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.25);flex:0 0 auto}
+.busy{position:fixed;inset:0;background:rgba(15,61,110,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#fff;font-weight:700;z-index:50}
+.spin{width:54px;height:54px;border-radius:50%;border:6px solid rgba(255,255,255,.3);border-top-color:#fff;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+textarea.caption{width:100%;border:2px solid #ece8f4;font:inherit;resize:vertical;display:block}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{padding:8px 14px;border-radius:99px;background:#f3f1f7;cursor:pointer;font-size:13px;font-weight:600;user-select:none}
 .chip.on{background:var(--navy);color:#fff}
@@ -65,7 +69,7 @@ aside h1{font-size:20px;margin:14px 0 10px}.steps{flex-direction:row}.step{flex:
 <div class="layout">
 <aside>
   <div class="brand">
-    <img src="logo.png" alt="logo" onerror="this.outerHTML='<div class=logo-fallback>logo.png</div>'">
+    <img alt="logo">
     <div><b data-i="org"></b><small data-i="brandSub"></small></div>
   </div>
   <div class="langs" id="langs"></div>
@@ -104,7 +108,7 @@ aside h1{font-size:20px;margin:14px 0 10px}.steps{flex-direction:row}.step{flex:
   <canvas id="cv" width="1080" height="1350"></canvas>
   <label data-i="lZoom"></label><input type="range" id="zoom" min="1" max="3" step="0.01" value="1">
   <input type="file" id="file" accept="image/*" class="hidden">
-  <button class="btn" id="pick"></button>
+  <div class="row"><button class="btn" id="pick"></button><button class="btn sec" id="rotBtn" data-i="rot" style="flex:0 0 auto;width:auto;padding:16px 20px;margin-top:20px"></button></div>
   <div class="err" id="e2"></div>
   <div class="row"><button class="btn sec" id="back1" data-i="back"></button><button class="btn navy" id="to3" data-i="make"></button></div>
 </section>
@@ -112,17 +116,21 @@ aside h1{font-size:20px;margin:14px 0 10px}.steps{flex-direction:row}.step{flex:
 <section id="s3" class="card hidden">
   <h2 data-i="c3h"></h2><p class="sub" data-i="c3sub"></p>
   <img id="result" style="width:100%;border-radius:22px" alt="">
+  <label data-i="lFormat" style="margin-top:14px"></label><div class="chips" id="fmts"></div>
   <div class="row"><button class="btn sec" id="back2" data-i="back2"></button><button class="btn sec" id="dl" data-i="dl"></button></div>
   <button class="btn" id="share" data-i="share"></button>
   <button class="btn navy" id="openGroup" data-i="openGroup"></button>
   <div class="ok hidden" id="msg"></div>
   <p class="sub" style="margin-top:18px" data-i="postHint"></p>
   <div class="tags" id="tags"></div>
-  <div class="caption" id="caption"></div>
+  <p class="sub" style="margin:0 0 6px" data-i="capEdit"></p>
+  <textarea class="caption" id="caption" rows="6"></textarea>
+  <button class="btn sec" id="capNext" data-i="capNext"></button>
   <button class="btn sec" id="copy" data-i="copy"></button>
 </section>
 
 <footer data-i="foot"></footer>
+<div class="busy hidden" id="busy"><div class="spin"></div><p data-i="busy"></p></div>
 </div></main>
 </div>
 
@@ -134,9 +142,7 @@ const CONFIG={
   ORG_EN:"Diwan of the Youth and Sports Sector",
   GROUP_URL:"https://www.facebook.com/groups/2774742762636930/",
   QR_URL:"",   // رابط رمز QR على الصورة (فارغ = رابط المجموعة). ضع رابط موقعك إن أردت
-  HASHTAGS:["#ديوان_قطاع_الشباب_والرياضة","#شباب_الجزائر","#الجزائر_اولا"],
-  LOGO:"logo.png",
-  WEBHOOK_URL:""   // رابط Google Apps Script (انظر apps-script.gs)
+  HASHTAGS:["#ديوان_قطاع_الشباب_والرياضة","#شباب_الجزائر","#الجزائر_أولاً"],
 };
 /* ========================================= */
 
@@ -165,12 +171,12 @@ const AGES=[{ar:"أقل من 18",fr:"Moins de 18 ans",en:"Under 18"},{ar:"18 - 2
 /* tpl = رقم القالب المقترح تلقائياً لهذه الصفة */
 const GENDERS=[{ar:"ذكر",fr:"Homme",en:"Male"},{ar:"أنثى",fr:"Femme",en:"Female"}];
 const ROLES=[
- {ar:"شاب",fr:"Jeune",en:"Young person",tpl:4,f:{ar:"شابة",fr:"Jeune",en:"Young person"}},
+ {ar:"شاب",fr:"Jeune",en:"Young person",tpl:6,f:{ar:"شابة",fr:"Jeune",en:"Young person"}},
  {ar:"رياضي",fr:"Sportif",en:"Athlete",tpl:3,f:{ar:"رياضية",fr:"Sportive",en:"Athlete"}},
  {ar:"متطوع",fr:"Bénévole",en:"Volunteer",tpl:8,f:{ar:"متطوعة",fr:"Bénévole",en:"Volunteer"}},
- {ar:"رئيس جمعية",fr:"Président d'association",en:"Association president",tpl:2,f:{ar:"رئيسة جمعية",fr:"Présidente d'association",en:"Association president"}},
+ {ar:"رئيس جمعية",fr:"Président d'association",en:"Association president",tpl:1,f:{ar:"رئيسة جمعية",fr:"Présidente d'association",en:"Association president"}},
  {ar:"موظف بالقطاع",fr:"Agent du secteur",en:"Sector staff member",tpl:0,f:{ar:"موظفة بالقطاع",fr:"Agente du secteur",en:"Sector staff member"}},
- {ar:"مدرب",fr:"Entraîneur",en:"Coach",tpl:3,f:{ar:"مدربة",fr:"Entraîneuse",en:"Coach"}},
+ {ar:"مدرب",fr:"Entraîneur",en:"Coach",tpl:7,f:{ar:"مدربة",fr:"Entraîneuse",en:"Coach"}},
  {ar:"أخرى",fr:"Autre",en:"Other",tpl:0,other:1,f:{ar:"أخرى",fr:"Autre",en:"Other"}}];
 const OTHER=ROLES.findIndex(r=>r.other);
 const roleLabel=i=>ROLES[i].other?(data.otherRole||""):(data.gender===1?ROLES[i].f[lang]:ROLES[i][lang]);
@@ -181,53 +187,55 @@ const SLOGANS=[
  {ar:"معاً نبني جزائر الغد",fr:"Ensemble, construisons l'Algérie de demain",en:"Together we build tomorrow's Algeria"},
  {ar:"الرياضة تجمعنا",fr:"Le sport nous unit",en:"Sport brings us together"},
  {ar:"لنبني صروح الفكر.. لا نكن معاول هدم",fr:"Bâtissons des citadelles du savoir, non des outils de destruction",en:"Let us build citadels of knowledge, not tools of destruction"}];
-const TPL_EN=["Diwan Blue","National Green","Elegant Gold","Sporty","Modern","1st November","Youth Week","Sports Event","Volunteer"];
-const TAG_EN={3:"Athlete of the Diwan community",5:"1st November 1954 anniversary",6:"Youth Week",7:"I'm at the sports event",8:"Volunteer of the Diwan community"};
-const tplName=x=>lang==="ar"?x.n:lang==="fr"?x.nf:TPL_EN[TPLS.indexOf(x)];
-const tagFor=(T,fem)=>lang==="ar"?((fem&&T.tagW)||T.tag):lang==="fr"?((fem&&T.tagWf)||T.tagf):TAG_EN[TPLS.indexOf(T)];
+const tplName=x=>x.n[lang];
+const tagFor=(T,fem)=>{const g=T.tag;if(!g)return null;return lang==="ar"?((fem&&g.arW)||g.ar):lang==="fr"?((fem&&g.frW)||g.fr):g.en};
 const TPLS=[
- {n:"أزرق الديوان",nf:"Bleu Diwan",bg:"blue",shape:"round",ring:[[34,"#ffffff"],[12,"#ffd23f"]],glow:"#6fd0ff",
-  head:"#ffffff",hshadow:1,sub:"#dcecff",badge:"#ff5a36",orn:"#ffd23f",
-  plate:{fill:["#ffffff","#e6f0ff"],border:[5,"#ffd23f"],tx:"#0f3d6e"},
-  pill:{fill:["#ff8a50","#ff5a36"],tx:"#ffffff"}},
- {n:"الأخضر الوطني",nf:"Vert national",bg:"green",shape:"arch",ring:[[36,"gold"],[24,"#fff8e1"],[10,"gold"]],
-  head:"#ffffff",hshadow:1,sub:"#d9f2e0",badge:"#d21034",orn:"#e6b93c",
-  plate:{fill:["#fffdf5","#f1e7cb"],border:[5,"gold"],tx:"#0b5d2e"},
-  pill:{fill:["#e8203f","#b80d2c"],tx:"#ffffff"}},
- {n:"ذهبي أنيق",nf:"Doré élégant",bg:"ivory",shape:"circle",ring:[[38,"gold"],[26,"#fffaf0"],[12,"gold"]],dv:"#c9971c",
-  head:"#0b5d2e",sub:"#6b5a1f",badge:"#0b5d2e",orn:"#c9971c",
-  plate:{fill:["#118044","#0a5226"],border:[5,"gold"],tx:"#ffffff"},
-  pill:{fill:"gold",tx:"#3a2800"}},
- {n:"رياضي",nf:"Sportif",bg:"sport",shape:"hex",ring:[[48,"#0e0c26"],[30,"#ff5a36"],[10,"#ffd23f"]],glow:"#ff5a36",
-  head:"#ffffff",hshadow:1,sub:"#ffd9cc",badge:"#22c55e",orn:"#ffd23f",
-  plate:{skew:1,fill:["#ff5a36","#ff2e63"],border:[4,"#ffd23f"],tx:"#ffffff"},
-  pill:{fill:["#ffe066","#ffc400"],tx:"#1d1b3a"},
-  tag:"رياضي في مجتمع الديوان",tagf:"Sportif de la communauté du Diwan",tagW:"رياضية في مجتمع الديوان",tagWf:"Sportive de la communauté du Diwan"},
- {n:"عصري",nf:"Moderne",bg:"modern",shape:"round",ring:[[34,"#0b5d2e"],[14,"#ffffff"]],back:{color:"#d21034",dx:28,dy:28},dv:"#0b5d2e",
-  head:"#0b5d2e",sub:"#4b5563",badge:"#d21034",orn:"#d21034",
-  plate:{fill:["#0d7a3b","#094d25"],border:[4,"#d21034"],tx:"#ffffff"},
-  pill:{fill:["#e8203f","#b80d2c"],tx:"#ffffff"}},
- {n:"ذكرى أول نوفمبر",nf:"1er Novembre",bg:"nov",shape:"circle",ring:[[40,"#d21034"],[28,"#ffffff"],[12,"#d21034"]],glow:"#2fbf71",
-  head:"#ffffff",hshadow:1,sub:"#cfeedd",badge:"#d21034",orn:"#ffffff",
-  plate:{fill:["#fdfcf8","#eadfc4"],border:[5,"#d21034"],tx:"#0b5d2e"},
-  pill:{fill:["#e8203f","#b80d2c"],tx:"#ffffff"},
-  tag:"ذكرى أول نوفمبر 1954",tagf:"Anniversaire du 1er Novembre 1954"},
- {n:"أسبوع الشباب",nf:"Semaine jeunesse",bg:"youth",shape:"round",ring:[[36,"#ffffff"],[14,"#ffd23f"]],glow:"#ffd23f",
-  head:"#ffffff",hshadow:1,sub:"#ffe9f6",badge:"#22d3ee",orn:"#ffd23f",
-  plate:{fill:["#ffffff","#fff0fa"],border:[5,"#ffd23f"],tx:"#5b21b6"},
-  pill:{fill:["#ffe066","#ffc400"],tx:"#3b1a8f"},
-  tag:"أسبوع الشباب",tagf:"Semaine de la jeunesse"},
- {n:"تظاهرة رياضية",nf:"Événement sportif",bg:"stadium",shape:"circle",ring:[[38,"#ffffff"],[22,"#0a6b34"],[10,"gold"]],
-  head:"#ffffff",hshadow:1,sub:"#d9f5e3",badge:"#ff5a36",orn:"#ffd23f",
-  plate:{fill:["#13265e","#0a1433"],border:[5,"#ffd23f"],tx:"#ffffff"},
-  pill:{fill:["#ffffff","#e8f5ec"],tx:"#0a6b34"},
-  tag:"أنا في التظاهرة الرياضية",tagf:"Je participe à l'événement sportif"},
- {n:"متطوع",nf:"Bénévole",bg:"vol",shape:"arch",ring:[[36,"#ffffff"],[12,"#5eead4"]],glow:"#5eead4",
-  head:"#ffffff",hshadow:1,sub:"#d9f7f1",badge:"#ff5a36",orn:"#ff8f73",
-  plate:{fill:["#ffffff","#e3f9f5"],border:[5,"#5eead4"],tx:"#0f766e"},
-  pill:{fill:["#ff9a7e","#ff5a36"],tx:"#ffffff"},
-  tag:"متطوع في مجتمع الديوان",tagf:"Bénévole de la communauté du Diwan",tagW:"متطوعة في مجتمع الديوان",tagWf:"Bénévole de la communauté du Diwan"}
+ {id:"aurora",n:{ar:"أورورا",fr:"Aurore",en:"Aurora"},bg:"aurora",shape:"round",ring:[[30,"rgba(255,255,255,.16)"],[7,"rgba(255,255,255,.95)"]],glow:"#22d3ee",
+  head:"#ffffff",hshadow:1,sub:"#d7e6ff",badge:"#10d9a0",orn:"#7ee8fa",sw:"linear-gradient(135deg,#00c8ff,#8b5cf6 55%,#ff4fa3)",
+  plate:{fill:["rgba(16,22,70,.88)","rgba(34,20,92,.88)"],border:[3,"rgba(126,232,250,.9)"],tx:"#ffffff"},pill:{fill:["#22d3ee","#8b5cf6"],tx:"#ffffff"}},
+ {id:"royal",n:{ar:"ملكي",fr:"Royal",en:"Royal"},bg:"royal",shape:"horse",ring:[[36,"gold"],[24,"#fff8e1"],[8,"gold"]],
+  head:"#ffffff",hshadow:1,sub:"#e6f4ea",badge:"#d21034",orn:"#e6b93c",sw:"linear-gradient(#021f10,#0a5428 60%,#e6b93c)",
+  plate:{fill:["#fffdf5","#efe4c6"],border:[5,"gold"],tx:"#0b5d2e"},pill:{fill:["#e8203f","#b80d2c"],tx:"#ffffff"}},
+ {id:"sahara",n:{ar:"صحراء الجزائر",fr:"Sahara",en:"Sahara"},bg:"sahara",shape:"circle",ring:[[30,"#ffffff"],[10,"#ffd9a0"]],glow:"#ffb347",
+  head:"#ffffff",hshadow:1,sub:"#ffe9cf",badge:"#d21034",orn:"#ffd9a0",sw:"linear-gradient(#1b0f3d,#f0545b 55%,#ffd37a)",
+  plate:{fill:["#3a1745","#1d0a28"],border:[4,"#ffb347"],tx:"#ffe9cf"},pill:{fill:["#ffc766","#ff7a3d"],tx:"#2b1236"}},
+ {id:"neon",n:{ar:"نيون رياضي",fr:"Néon sport",en:"Neon Sport"},bg:"neon",shape:"hex",ring:[[50,"#06010f"],[18,"#00e5ff"],[6,"#ffffff"]],glow:"#ff2e93",
+  head:"#ffffff",hshadow:1,sub:"#ffd0ea",badge:"#22c55e",orn:"#00e5ff",sw:"linear-gradient(135deg,#06010f,#7c3aed 50%,#ff2e93)",
+  plate:{skew:1,fill:["#ff2e93","#7c3aed"],border:[4,"#00e5ff"],tx:"#ffffff"},pill:{fill:["#00e5ff","#22d3ee"],tx:"#06010f"},
+  tag:{ar:"رياضي في مجتمع الديوان",arW:"رياضية في مجتمع الديوان",fr:"Sportif de la communauté du Diwan",frW:"Sportive de la communauté du Diwan",en:"Athlete of the Diwan community"}},
+ {id:"paper",n:{ar:"طبقات الوطن",fr:"Strates",en:"Paper Layers"},bg:"paper",shape:"circle",ring:[[40,"#ffffff"],[10,"#0b6a32"]],
+  head:"#ffffff",hshadow:1,sub:"#31453a",badge:"#d21034",orn:"#d21034",sw:"linear-gradient(135deg,#06451f,#fbf7ee 55%,#d21034)",dv:"#ffffff",
+  plate:{fill:["#0d7a3b","#06451f"],border:[4,"#ffffff"],tx:"#ffffff"},pill:{fill:["#e8203f","#b80d2c"],tx:"#ffffff"}},
+ {id:"nov",n:{ar:"ذكرى أول نوفمبر",fr:"1er Novembre",en:"1st November"},bg:"nov",shape:"circle",ring:[[42,"#d21034"],[28,"#ffffff"],[12,"#d21034"]],glow:"#2fbf71",
+  head:"#ffffff",hshadow:1,sub:"#cfeedd",badge:"#d21034",orn:"#ffffff",sw:"linear-gradient(90deg,#064a24 60%,#d21034 60%)",
+  plate:{fill:["#fdfcf8","#eadfc4"],border:[5,"#d21034"],tx:"#0b5d2e"},pill:{fill:["#e8203f","#b80d2c"],tx:"#ffffff"},
+  tag:{ar:"ذكرى أول نوفمبر 1954",fr:"Anniversaire du 1er Novembre 1954",en:"1st November 1954 anniversary"}},
+ {id:"sunrise",n:{ar:"شروق الشباب",fr:"Aube jeunesse",en:"Youth Sunrise"},bg:"sunrise",shape:"round",ring:[[36,"#ffffff"],[12,"#ffe066"]],glow:"#fff3b0",
+  head:"#ffffff",hshadow:1,sub:"#fff0f7",badge:"#22d3ee",orn:"#ffffff",sw:"linear-gradient(#ffd23f,#ff3d7f 60%,#6d28d9)",
+  plate:{fill:["#ffffff","#fff0fa"],border:[5,"#ffe066"],tx:"#6d28d9"},pill:{fill:["#ffe066","#ffc400"],tx:"#4c1d95"},
+  tag:{ar:"أسبوع الشباب",fr:"Semaine de la jeunesse",en:"Youth Week"}},
+ {id:"stadium",n:{ar:"تظاهرة رياضية",fr:"Événement sportif",en:"Sports Event"},bg:"stadium",shape:"circle",ring:[[38,"#ffffff"],[22,"#0a6b34"],[10,"gold"]],
+  head:"#ffffff",hshadow:1,sub:"#d9f5e3",badge:"#ff5a36",orn:"#ffd23f",sw:"linear-gradient(#02281a,#0a6b34 60%,#ffffff)",
+  plate:{fill:["#13265e","#0a1433"],border:[5,"#ffd23f"],tx:"#ffffff"},pill:{fill:["#ffffff","#e8f5ec"],tx:"#0a6b34"},
+  tag:{ar:"أنا في التظاهرة الرياضية",fr:"Je participe à l'événement sportif",en:"I'm at the sports event"}},
+ {id:"volunteer",n:{ar:"متطوع",fr:"Bénévole",en:"Volunteer"},bg:"vol",shape:"arch",ring:[[36,"#ffffff"],[12,"#5eead4"]],glow:"#5eead4",
+  head:"#ffffff",hshadow:1,sub:"#d9f7f1",badge:"#ff5a36",orn:"#ff8f73",sw:"linear-gradient(#0f766e,#0f3d6e)",
+  plate:{fill:["#ffffff","#e3f9f5"],border:[5,"#5eead4"],tx:"#0f766e"},pill:{fill:["#ff9a7e","#ff5a36"],tx:"#ffffff"},
+  tag:{ar:"متطوع في مجتمع الديوان",arW:"متطوعة في مجتمع الديوان",fr:"Bénévole de la communauté du Diwan",frW:"Bénévole de la communauté du Diwan",en:"Volunteer of the Diwan community"}},
+ {id:"luxe",n:{ar:"ذهب فاخر",fr:"Or luxe",en:"Luxe Gold"},bg:"luxe",shape:"round",ring:[[34,"gold"],[22,"#fff4c9"],[8,"gold"]],
+  head:"#f6e7b0",hshadow:1,sub:"#e9d9a0",badge:"#e6b93c",orn:"#f5d878",sw:"linear-gradient(#010b06,#052917 55%,#e6b93c)",dv:"#e6b93c",
+  plate:{fill:["#0a3d22","#021a0e"],border:[5,"gold"],tx:"#f6e7b0"},pill:{fill:"gold",tx:"#2b1e00"}},
+ {id:"skyline",n:{ar:"سماء المدينة",fr:"Skyline",en:"City Skyline"},bg:"skyline",shape:"round",ring:[[34,"#ffffff"],[10,"#ffb36b"]],glow:"#ffb36b",
+  head:"#ffffff",hshadow:1,sub:"#ffe3d1",badge:"#ff7a3d",orn:"#ffd9b8",sw:"linear-gradient(#0a1740,#c4527a 60%,#ffa05a)",
+  plate:{fill:["#ffffff","#ffe9dc"],border:[5,"#ffb36b"],tx:"#2b1a5a"},pill:{fill:["#ffb36b","#ff7a3d"],tx:"#2b1a5a"}},
+ {id:"zellij",n:{ar:"زليج",fr:"Zellige",en:"Zellij"},bg:"zellij",shape:"horse",ring:[[34,"gold"],[12,"#ffffff"],[8,"gold"]],
+  head:"#ffffff",hshadow:1,sub:"#d6f1f5",badge:"#e6b93c",orn:"#e6b93c",sw:"linear-gradient(#042f3a,#08596b 55%,#e6b93c)",
+  plate:{fill:["#ffffff","#e3f4f7"],border:[5,"gold"],tx:"#0a4a5a"},pill:{fill:"gold",tx:"#06323d"}},
+ {id:"med",n:{ar:"زرقة المتوسط",fr:"Méditerranée",en:"Mediterranean"},bg:"med",shape:"circle",ring:[[34,"#ffffff"],[12,"#7fe3ff"]],glow:"#7fe3ff",
+  head:"#ffffff",hshadow:1,sub:"#e1f6ff",badge:"#ff7a3d",orn:"#ffffff",sw:"linear-gradient(#0a3a8c,#1491d4 55%,#27d3c3)",
+  plate:{fill:["#ffffff","#e4f7ff"],border:[5,"#7fe3ff"],tx:"#0a3a8c"},pill:{fill:["#ff9a5a","#ff6a3d"],tx:"#ffffff"}}
 ];
+const TPL_ROLE={young:6,athlete:3,vol:8,pres:1,staff:0,coach:7};
 
 const L={
 ar:{org:CONFIG.ORG_AR,brandSub:"",h1:"شارك صورتك مع مجموعة الديوان",st1:"البيانات",st2:"صورتك",st3:"المشاركة",
@@ -242,8 +250,9 @@ ar:{org:CONFIG.ORG_AR,brandSub:"",h1:"شارك صورتك مع مجموعة ال
  errName:"يرجى إدخال الاسم واللقب.",errConsent:"يرجى الموافقة على استعمال بياناتك وصورتك.",errPhoto:"يرجى اختيار صورة أولاً.",errMake:"تعذر إنشاء الصورة، أعد المحاولة.",
  msgDl:"تم تحميل الصورة.",msgShare:"اختر فيسبوك ثم مجموعة الديوان لنشر الصورة.",msgFb:"تم تحميل الصورة ونسخ التعليق. ألصق التعليق وأرفق الصورة في مجموعة الديوان.",
  msgCopy:"تم نسخ التعليق والوسوم ✓",msgCopyFail:"انسخ التعليق يدوياً من الأعلى.",
+ busy:"جارٍ إنشاء صورتك…",rot:"⟳ تدوير",fmtPost:"منشور 4:5",fmtSquare:"مربع 1:1",fmtStory:"قصة 9:16",capNext:"🔄 صيغة أخرى للتعليق",lFormat:"المقاس",capEdit:"يمكنك تعديل النص قبل نسخه:",
  imgName:"الاسم واللقب",addPhoto:"أضف صورتك هنا",wil:"ولاية ",pill:"أنا جزء من مجتمع الديوان",foot:"© ديوان قطاع الشباب والرياضة",lang:"Français"},
-fr:{org:CONFIG.ORG_FR,brandSub:"Votre voix compte… partagez votre photo",h1:"Partagez votre photo avec le groupe du Diwan",st1:"Infos",st2:"Photo",st3:"Partage",
+fr:{org:CONFIG.ORG_FR,brandSub:"",h1:"Partagez votre photo avec le groupe du Diwan",st1:"Infos",st2:"Photo",st3:"Partage",
  c1h:"Vos informations",c1sub:"Quelques infos qui apparaîtront sur votre photo. Seul le nom est obligatoire.",lName:"Nom et prénom *",pName:"Ex. : Mohamed Benali",
  lCountry:"Pays",lWilaya:"Wilaya",pickW:"Choisir la wilaya",lAge:"Tranche d'âge",lGender:"Sexe (facultatif)",pickAge:"Choisir",lRole:"Votre statut (facultatif)",
  lWork:"Lieu de travail / établissement / association (facultatif)",pWork:"Ex. : Association Al Amal",pOther:"Écrivez votre statut (ex. : journaliste, étudiant, artiste)",lCustom:"Ou écrivez votre propre mot / phrase courte (facultatif)",pCustom:"Ex. : J'aime mon pays et je le sers",lSlogan:"Phrase sur la photo (facultatif)",noSlogan:"Sans phrase",
@@ -255,8 +264,9 @@ fr:{org:CONFIG.ORG_FR,brandSub:"Votre voix compte… partagez votre photo",h1:"P
  errName:"Veuillez saisir votre nom et prénom.",errConsent:"Veuillez accepter l'utilisation de vos données et de votre photo.",errPhoto:"Veuillez d'abord choisir une photo.",errMake:"Impossible de créer l'image, réessayez.",
  msgDl:"Image téléchargée.",msgShare:"Choisissez Facebook puis le groupe du Diwan pour publier l'image.",msgFb:"Image téléchargée et texte copié. Collez le texte et joignez l'image dans le groupe du Diwan.",
  msgCopy:"Texte et hashtags copiés ✓",msgCopyFail:"Copiez le texte manuellement ci-dessus.",
+ busy:"Création de votre image…",rot:"⟳ Pivoter",fmtPost:"Post 4:5",fmtSquare:"Carré 1:1",fmtStory:"Story 9:16",capNext:"🔄 Autre version du texte",lFormat:"Format",capEdit:"Vous pouvez modifier le texte avant de le copier :",
  imgName:"Nom et prénom",addPhoto:"Ajoutez votre photo ici",wil:"Wilaya de ",pill:"Je fais partie de la communauté du Diwan",foot:"© Diwan du secteur Jeunesse et Sports",lang:"العربية"},
-en:{org:CONFIG.ORG_EN,brandSub:"Your voice matters… share your photo",h1:"Share your photo with the Diwan group",st1:"Info",st2:"Photo",st3:"Share",
+en:{org:CONFIG.ORG_EN,brandSub:"",h1:"Share your photo with the Diwan group",st1:"Info",st2:"Photo",st3:"Share",
  c1h:"Your information",c1sub:"A few details that will appear on your photo. Only the name is required.",lName:"Full name *",pName:"E.g.: Mohamed Benali",
  lCountry:"Country",lWilaya:"Wilaya",pickW:"Choose your wilaya",lAge:"Age group",lGender:"Gender (optional)",pickAge:"Choose",lRole:"Your role (optional)",
  lWork:"Workplace / institution / association (optional)",pWork:"E.g.: Al Amal Youth Association",pOther:"Write your role (e.g.: journalist, student, artist)",lCustom:"Or write your own word / short sentence (optional)",pCustom:"E.g.: I love my country and serve it",lSlogan:"Phrase on the photo (optional)",noSlogan:"No phrase",
@@ -268,6 +278,7 @@ en:{org:CONFIG.ORG_EN,brandSub:"Your voice matters… share your photo",h1:"Shar
  errName:"Please enter your full name.",errConsent:"Please agree to the use of your data and photo.",errPhoto:"Please choose a photo first.",errMake:"Could not create the image, please try again.",
  msgDl:"Image downloaded.",msgShare:"Choose Facebook, then the Diwan group, to post the image.",msgFb:"Image downloaded and text copied. Paste the text and attach the image in the Diwan group.",
  msgCopy:"Text and hashtags copied ✓",msgCopyFail:"Please copy the text manually from above.",
+ busy:"Creating your image…",rot:"⟳ Rotate",fmtPost:"Post 4:5",fmtSquare:"Square 1:1",fmtStory:"Story 9:16",capNext:"🔄 Another version of the text",lFormat:"Size",capEdit:"You can edit the text before copying it:",
  imgName:"Full name",addPhoto:"Add your photo here",wil:"Wilaya of ",pill:"I'm part of the Diwan community",foot:"© Diwan of the Youth and Sports Sector"}
 };
 
@@ -309,10 +320,11 @@ function applyLang(){
   document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";
   document.querySelectorAll("[data-i]").forEach(e=>e.textContent=t(e.dataset.i));
   document.querySelectorAll("[data-p]").forEach(e=>e.placeholder=t(e.dataset.p));
+  if(typeof buildFormats==="function")buildFormats();
   $("langs").innerHTML=LANGS.map(([k,n])=>`<button class="lang${k===lang?" on":""}" data-l="${k}">${n}</button>`).join("");
   $("pick").textContent=img?t("pick2"):t("pick");
   build();draw();renderThumbs();
-  if(blob)$("caption").textContent=caption();
+  if(blob)setCap();
 }
 $("langs").onclick=e=>{const b=e.target.closest("button");if(!b)return;lang=b.dataset.l;try{localStorage.setItem("diwan_lang",lang)}catch(x){}applyLang()};
 $("fCountry").onchange=()=>{syncCountry();draw()};
@@ -344,7 +356,7 @@ $("to2").onclick=()=>{
 
 /* الخطوة 2 */
 const cv=$("cv");let ctx=cv.getContext("2d");const mainCtx=ctx;
-let img=null,zoom=1,ox=0,oy=0;
+let img=null,zoom=1,ox=0,oy=0,rot=0;
 const logo=new Image();let logoOK=false;
 logo.onload=()=>{logoOK=true;draw();renderThumbs()};logo.src=LOGO_DATA;
 function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
@@ -422,56 +434,113 @@ function swoosh(){ctx.save();if(!AR){ctx.translate(W,0);ctx.scale(-1,1)}
   ctx.strokeStyle="#ffffff";ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(166,775);ctx.bezierCurveTo(192,905,120,1085,10,1190);ctx.stroke();
   ctx.restore()}
 
+/* ===== أدوات الرسم المتقدمة ===== */
+const gl=(st,x0,y0,x1,y1)=>{const g=ctx.createLinearGradient(x0,y0,x1,y1);st.forEach(([o,c])=>g.addColorStop(o,c));return g};
+let _gr=null;
+function grain(a){if(!_gr){_gr=document.createElement("canvas");_gr.width=_gr.height=220;const k=_gr.getContext("2d"),id=k.createImageData(220,220),r=mulberry(77);for(let i=0;i<id.data.length;i+=4){const v=r()<.5?0:255;id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=r()*70}k.putImageData(id,0,0)}
+  ctx.save();ctx.globalAlpha=a;ctx.fillStyle=ctx.createPattern(_gr,"repeat");ctx.fillRect(0,0,W,H);ctx.restore()}
+function vignette(a){const g=ctx.createRadialGradient(540,650,380,540,650,1080);g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(1,`rgba(0,0,0,${a})`);ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
+function islamic(hex,al,s,lw,fillHex,fillAl){ctx.save();ctx.strokeStyle=rgba(hex,al);ctx.lineWidth=lw;
+  for(let j=-1,y=-s/2;y<H+s;y+=s,j++)for(let i=-1,x=-s/2;x<W+s;x+=s,i++){const cx=x+s/2,cy=y+s/2,R=s*.58;
+    for(const rot of [Math.PI/4,0]){ctx.beginPath();for(let k=0;k<4;k++){const a=rot+k*Math.PI/2;ctx[k?"lineTo":"moveTo"](cx+Math.cos(a)*R,cy+Math.sin(a)*R)}ctx.closePath();
+      if(fillHex&&rot===0){ctx.fillStyle=rgba(fillHex,((i+j)&1)?fillAl:fillAl*.45);ctx.fill()}ctx.stroke()}
+    ctx.beginPath();ctx.arc(cx,cy,s*.2,0,7);ctx.stroke();ctx.beginPath();ctx.arc(cx+s/2,cy+s/2,s*.07,0,7);ctx.stroke()}
+  ctx.restore()}
+function dune(y,amp,col,seed){const r=mulberry(seed);ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(-10,H);ctx.lineTo(-10,y);let x=-10;
+  while(x<W+10){const w=280+r()*240,h=(r()-.5)*amp;ctx.bezierCurveTo(x+w*.35,y+h-amp*.5,x+w*.7,y+h+amp*.4,x+w,y+(r()-.5)*amp*.5);x+=w}
+  ctx.lineTo(W+10,H);ctx.closePath();ctx.fill()}
+function palm(x,y,h,col,lean){ctx.save();ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=h*.035;ctx.lineCap="round";
+  const tx=x+lean*h,ty=y-h;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+lean*h*.15,y-h*.6,tx,ty);ctx.stroke();
+  for(let i=0;i<8;i++){const a=-Math.PI/2+(i-3.5)*.55+lean*.3;ctx.save();ctx.translate(tx,ty);ctx.rotate(a);ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(h*.24,-h*.18,h*.46,h*.03);ctx.quadraticCurveTo(h*.24,-h*.07,0,0);ctx.fill();ctx.restore()}
+  ctx.restore()}
+function minaret(x,base,h,col){ctx.fillStyle=col;const w=34;ctx.fillRect(x-w/2,base-h,w,h+40);ctx.fillRect(x-w*.8,base-h*.78,w*1.6,12);ctx.fillRect(x-w*.62,base-h-34,w*1.24,34);
+  ctx.beginPath();ctx.arc(x,base-h-34,w*.62,Math.PI,0);ctx.fill();ctx.fillRect(x-2,base-h-34-w*.62-30,4,30);crescent(x,base-h-34-w*.62-52,15,col,false)}
+function skyline(base,col,seed,lit,litCol){const r=mulberry(seed);let x=-20;
+  while(x<W+20){const w=46+r()*86,h=70+r()*200,top=base-h;ctx.fillStyle=col;ctx.fillRect(x,top,w,H-top);
+    if(r()<.3){ctx.beginPath();ctx.arc(x+w/2,top,w*.42,Math.PI,0);ctx.fill()}
+    if(lit){ctx.fillStyle=litCol;for(let yy=top+16;yy<Math.min(base-4,1115);yy+=22)for(let xx=x+9;xx<x+w-12;xx+=17)if(r()<lit)ctx.fillRect(xx,yy,7,10)}
+    x+=w+r()*8}}
+function wave(y,amp,len,col,ph){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(0,y);for(let x=0;x<=W;x+=12)ctx.lineTo(x,y+Math.sin(x/len*6.2832+ph)*amp);ctx.lineTo(W,H);ctx.closePath();ctx.fill()}
+function bokeh(seed,n,cols,rmin,rmax,al){const r=mulberry(seed);for(let i=0;i<n;i++){const x=r()*W,y=r()*H,rad=rmin+r()*(rmax-rmin),c=cols[i%cols.length];const g=ctx.createRadialGradient(x,y,0,x,y,rad);g.addColorStop(0,rgba(c,al));g.addColorStop(.7,rgba(c,al*.6));g.addColorStop(1,rgba(c,0));ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,rad,0,7);ctx.fill()}}
+function stars(seed,n,y0,y1,hex){const r=mulberry(seed);for(let i=0;i<n;i++){ctx.fillStyle=rgba(hex,.25+r()*.65);const s=1.2+r()*2.8;ctx.beginPath();ctx.arc(r()*W,y0+r()*(y1-y0),s,0,7);ctx.fill()}}
+function paperLayer(draw,col){ctx.save();sh("rgba(0,0,0,.38)",26,10);ctx.fillStyle=col;ctx.beginPath();draw();ctx.fill();ctx.restore()}
+
 const BG={
-blue(){ctx.fillStyle=lin(["#06264b","#0d4a88","#1c7ed6"]);ctx.fillRect(0,0,W,H);rays(540,640,30,"#ffffff",.12);glow(540,640,780,"#6fd0ff",.5);geo("#ffffff",.045,110);
-  const r=mulberry(5);for(let i=0;i<30;i++){ctx.fillStyle=rgba("#ffffff",.03+r()*.07);ctx.beginPath();ctx.arc(r()*W,r()*H,12+r()*50,0,7);ctx.fill()}
-  ctx.fillStyle=rgba("#ff5a36",.95);ctx.beginPath();ctx.arc(0,H,220,0,7);ctx.fill();ctx.fillStyle=rgba("#ffd23f",.92);ctx.beginPath();ctx.arc(W,H,120,0,7);ctx.fill();
-  [[110,360,20],[985,380,26],[80,900,18],[1000,990,22],[540,300,14]].forEach(p=>sparkle(p[0],p[1],p[2],"#ffffff",.85))},
-green(){ctx.fillStyle=lin(["#03301a","#0b5d2e","#138c47"]);ctx.fillRect(0,0,W,H);geo("#ffffff",.055,120);rays(540,600,24,"#e8c75a",.1);glow(540,640,720,"#f5d878",.34);
-  crescent(AR?170:910,430,190,rgba("#ffffff",.07));
-  ctx.fillStyle=rgba("#ffffff",.09);ctx.beginPath();ctx.moveTo(0,1190);ctx.bezierCurveTo(300,1090,700,1300,W,1160);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();
-  ctx.strokeStyle=rgba("#d21034",.95);ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(0,1215);ctx.bezierCurveTo(300,1115,700,1325,W,1185);ctx.stroke();
-  [[100,520,18],[990,300,22],[960,820,16],[70,950,22]].forEach(p=>sparkle(p[0],p[1],p[2],"#f5d878",.9))},
-ivory(){ctx.fillStyle=lin(["#fffef8","#f6ecd0"]);ctx.fillRect(0,0,W,H);geo("#c9971c",.13,110);glow(540,660,680,"#ffffff",.95);swoosh();
-  const g=goldG(0,0,300,300);laurel(96,1075,470,-1.28,false,g);laurel(984,1075,470,-1.28,true,g);
-  [[960,330,20],[100,1010,16],[1000,860,18]].forEach(p=>sparkle(p[0],p[1],p[2],"#d4a437",.9))},
-sport(){ctx.fillStyle=lin(["#0e0c26","#231a63","#3b2f9a"]);ctx.fillRect(0,0,W,H);
-  ctx.save();ctx.translate(540,675);ctx.rotate(-.5);for(let i=-6;i<=6;i++){ctx.fillStyle=rgba(i%2?"#ff5a36":"#ffd23f",i%2?.17:.1);ctx.fillRect(i*170-40,-1400,70,2800)}ctx.restore();
-  glow(540,660,680,"#ff5a36",.38);
-  ctx.lineCap="round";for(let i=0;i<9;i++){const y=330+i*86,l=70+(i%3)*45;ctx.strokeStyle=rgba("#ffffff",.2);ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(30,y);ctx.lineTo(30+l,y);ctx.moveTo(W-30,y+40);ctx.lineTo(W-30-l,y+40);ctx.stroke()}
-  [[120,300,20],[980,1000,24],[90,1100,16]].forEach(p=>sparkle(p[0],p[1],p[2],"#ffd23f",.9))},
-modern(){ctx.fillStyle=lin(["#ffffff","#e9eef5"]);ctx.fillRect(0,0,W,H);
-  ctx.fillStyle=rgba("#0b5d2e",.10);for(let y=40;y<H;y+=40)for(let x=(y/40%2)*20;x<W;x+=40){ctx.beginPath();ctx.arc(x,y,3.2,0,7);ctx.fill()}
-  ctx.fillStyle=lin(["#0b5d2e","#16914a"],0,500,300,1100);ctx.beginPath();ctx.arc(-110,900,300,0,7);ctx.fill();
-  ctx.fillStyle=lin(["#d21034","#ff4d6d"],800,300,1100,800);ctx.beginPath();ctx.arc(1190,500,300,0,7);ctx.fill();
-  crescent(960,1180,110,rgba("#0b5d2e",.9));
-  [[120,330,16],[1000,300,18]].forEach(p=>sparkle(p[0],p[1],p[2],"#d4a437",.95))},
-nov(){ctx.fillStyle=lin(["#021a0d","#073d1f","#0d5c2e"]);ctx.fillRect(0,0,W,H);geo("#ffffff",.04,120);glow(540,650,740,"#2fbf71",.32);
-  crescent(AR?830:250,700,430,rgba("#d21034",.3));
+aurora(){ctx.fillStyle=gl([[0,"#050816"],[.5,"#0d1440"],[1,"#190f4d"]],0,0,W,H);ctx.fillRect(0,0,W,H);
+  glow(120,180,780,"#00c8ff",.55);glow(990,380,720,"#8b5cf6",.6);glow(260,1060,840,"#10d9a0",.42);glow(950,1250,660,"#ff4fa3",.46);glow(540,700,560,"#3b82f6",.28);
+  ctx.save();ctx.lineWidth=2;for(let i=0;i<16;i++){ctx.strokeStyle=rgba("#ffffff",.03+i*.003);ctx.beginPath();ctx.ellipse(540,720,500+i*56,420+i*48,-.38,0,7);ctx.stroke()}ctx.restore();
+  stars(4,110,0,H,"#ffffff");bokeh(8,14,["#7ee8fa","#c4b5fd","#ffffff"],20,60,.22);
+  [[100,330,20],[985,520,26],[90,1010,18],[995,1010,22]].forEach(p=>sparkle(p[0],p[1],p[2],"#ffffff",.9));vignette(.35);grain(.07)},
+royal(){ctx.fillStyle=gl([[0,"#021f10"],[.5,"#0a5428"],[1,"#04301a"]],0,0,0,H);ctx.fillRect(0,0,W,H);
+  islamic("#e6b93c",.2,150,2.2);glow(540,640,780,"#2fbf71",.38);glow(540,1260,560,"#e6b93c",.28);glow(540,40,520,"#e6b93c",.22);
+  crescent(AR?930:150,420,180,rgba("#e6b93c",.17));
+  [[90,520,18],[990,320,22],[970,880,16],[70,960,22]].forEach(p=>sparkle(p[0],p[1],p[2],"#f5d878",.9));vignette(.5);grain(.06)},
+sahara(){ctx.fillStyle=gl([[0,"#1b0f3d"],[.3,"#6a2c70"],[.55,"#f0545b"],[.72,"#ff9a4d"],[.85,"#ffd37a"]],0,0,0,1000);ctx.fillRect(0,0,W,H);
+  stars(12,70,0,520,"#ffffff");glow(540,690,780,"#ffd37a",.7);
+  const sg=ctx.createRadialGradient(540,690,360,540,690,500);sg.addColorStop(0,"rgba(255,214,120,.95)");sg.addColorStop(1,"rgba(255,140,70,.0)");ctx.fillStyle=sg;ctx.beginPath();ctx.arc(540,690,500,0,7);ctx.fill();
+  rays(540,690,40,"#fff3c4",.2);crescent(AR?170:910,430,60,rgba("#ffe9b0",.9));
+  dune(905,70,"#f2995a",1);dune(985,80,"#c25a5e",2);palm(120,1040,330,"#2a0f33",.14);palm(985,1050,290,"#2a0f33",-.14);palm(900,1050,200,"#2a0f33",-.08);dune(1080,70,"#7a3066",3);dune(1170,60,"#3a1448",4);
+  vignette(.3);grain(.07)},
+neon(){ctx.fillStyle=gl([[0,"#06010f"],[.55,"#150636"],[1,"#2a0a4a"]],0,0,0,H);ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.strokeStyle=rgba("#00e5ff",.075);ctx.lineWidth=2;const hs=62;for(let row=-1;row<H/(hs*1.5)+1;row++)for(let col=-1;col<W/(hs*1.732)+1;col++){poly(col*hs*1.732+(row%2?hs*.866:0),row*hs*1.5,hs,6,Math.PI/6);ctx.stroke()}ctx.restore();
+  glow(180,300,680,"#00e5ff",.38);glow(930,640,720,"#ff2e93",.5);glow(540,1260,640,"#7c3aed",.55);
+  ctx.save();ctx.translate(540,675);ctx.rotate(-.62);const cols=["#ff2e93","#00e5ff","#ffe066"];for(let i=-5;i<=5;i++){ctx.fillStyle=rgba(cols[(i+5)%3],.15);ctx.fillRect(i*210-30,-1500,16+((i+5)%3)*16,3000)}
+  ctx.shadowBlur=36*SC;ctx.lineCap="round";[["#00e5ff",-110],["#ff2e93",110]].forEach(([c,o])=>{ctx.shadowColor=c;ctx.strokeStyle=c;ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(o+250,-1500);ctx.lineTo(o+250,1500);ctx.stroke()});ctx.restore();
+  ctx.strokeStyle=rgba("#ff2e93",.28);ctx.lineWidth=2;for(let i=-12;i<=12;i++){ctx.beginPath();ctx.moveTo(540+i*36,1180);ctx.lineTo(540+i*330,H);ctx.stroke()}for(let j=0;j<6;j++){const y=1180+Math.pow(j/5,1.7)*170;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+  [[110,420,20],[985,300,24]].forEach(p=>sparkle(p[0],p[1],p[2],"#00e5ff",.95));vignette(.4);grain(.06)},
+paper(){ctx.fillStyle=gl([[0,"#fbf7ee"],[1,"#efe6d0"]],0,0,0,H);ctx.fillRect(0,0,W,H);islamic("#0b5d2e",.05,150,2);
+  paperLayer(()=>{ctx.moveTo(0,0);ctx.lineTo(W,0);ctx.lineTo(W,372);ctx.bezierCurveTo(760,420,380,300,0,402)},"#17a34a");
+  paperLayer(()=>{ctx.moveTo(0,0);ctx.lineTo(W,0);ctx.lineTo(W,318);ctx.bezierCurveTo(740,372,360,236,0,354)},"#0b6a32");
+  paperLayer(()=>{ctx.moveTo(0,0);ctx.lineTo(W,0);ctx.lineTo(W,262);ctx.bezierCurveTo(720,318,340,182,0,300)},"#06451f");
+  const q=(r,col)=>paperLayer(()=>{ctx.moveTo(0,H);ctx.lineTo(0,H-r);ctx.arc(0,H,r,-Math.PI/2,0);ctx.closePath()},col);q(330,"#d21034");q(262,"#ffffff");q(196,"#0b6a32");
+  const q2=(r,col)=>paperLayer(()=>{ctx.moveTo(W,H);ctx.lineTo(W,H-r);ctx.arc(W,H,r,-Math.PI/2,Math.PI,true);ctx.closePath()},col);q2(330,"#0b6a32");q2(262,"#ffffff");q2(196,"#d21034");
+  crescent(AR?960:120,640,80,rgba("#0b5d2e",.1));grain(.05)},
+nov(){ctx.fillStyle=gl([[0,"#021a0d"],[.5,"#073d1f"],[1,"#0d5c2e"]],0,0,0,H);ctx.fillRect(0,0,W,H);islamic("#ffffff",.05,140,2);glow(540,650,760,"#2fbf71",.34);
+  crescent(AR?830:250,700,440,rgba("#d21034",.3));
   ctx.fillStyle=rgba("#ffffff",.06);ctx.beginPath();ctx.moveTo(0,1000);ctx.lineTo(W,640);ctx.lineTo(W,820);ctx.lineTo(0,1180);ctx.fill();
-  const r=mulberry(3);for(let i=0;i<16;i++){ctx.fillStyle=rgba(i%2?"#ffffff":"#f5d878",.15+r()*.3);star(r()*W,r()*H,8+r()*12,3+r()*4,5);ctx.fill()}
-  ctx.fillStyle=rgba("#d21034",.9);ctx.beginPath();ctx.moveTo(0,1230);ctx.bezierCurveTo(300,1130,700,1330,W,1200);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();
-  ctx.fillStyle=rgba("#ffffff",.95);ctx.beginPath();ctx.moveTo(0,1285);ctx.bezierCurveTo(300,1185,700,1385,W,1255);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill()},
-youth(){ctx.fillStyle=lin(["#3b1a8f","#a21caf","#ff5a36"],0,0,W,H);ctx.fillRect(0,0,W,H);glow(280,260,620,"#ffd23f",.38);glow(850,1100,720,"#22d3ee",.32);
-  ctx.fillStyle=rgba("#ffffff",.07);[[80,700,200],[1010,420,160],[540,1250,260]].forEach(c=>{ctx.beginPath();ctx.arc(c[0],c[1],c[2],0,7);ctx.fill()});
-  confetti(mulberry(9),["#ffd23f","#22d3ee","#ffffff","#ff5a36","#a3e635"],90);
-  [[100,330,26],[990,330,30],[90,1020,22],[1000,1050,26],[540,290,18]].forEach(p=>sparkle(p[0],p[1],p[2],"#ffffff",.95))},
+  const r=mulberry(3);for(let i=0;i<18;i++){ctx.fillStyle=rgba(i%2?"#ffffff":"#f5d878",.15+r()*.3);star(r()*W,r()*H,8+r()*12,3+r()*4,5);ctx.fill()}
+  ctx.fillStyle=rgba("#d21034",.95);ctx.beginPath();ctx.moveTo(0,1230);ctx.bezierCurveTo(300,1130,700,1330,W,1200);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();
+  ctx.fillStyle=rgba("#ffffff",.96);ctx.beginPath();ctx.moveTo(0,1290);ctx.bezierCurveTo(300,1190,700,1390,W,1260);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();vignette(.35);grain(.06)},
+sunrise(){ctx.fillStyle=gl([[0,"#ff9a2e"],[.35,"#ff5a5f"],[.72,"#d6338a"],[1,"#5b21b6"]],0,0,0,H);ctx.fillRect(0,0,W,H);
+  rays(540,640,36,"#ffffff",.24);glow(540,640,680,"#fff3b0",.75);
+  ctx.save();ctx.lineCap="round";[[260,"rgba(255,255,255,.4)"],[190,"rgba(255,255,255,.28)"]].forEach(([o,c],i)=>{ctx.strokeStyle=c;ctx.lineWidth=12-i*4;ctx.beginPath();ctx.moveTo(-20,o+i*60);ctx.bezierCurveTo(300,o-120,700,o+260,W+20,o-40+i*50);ctx.stroke()});ctx.restore();
+  ctx.fillStyle=rgba("#ffffff",.1);[[70,720,200],[1010,420,170],[540,1280,300]].forEach(c=>{ctx.beginPath();ctx.arc(c[0],c[1],c[2],0,7);ctx.fill()});
+  confetti(mulberry(9),["#ffffff","#22d3ee","#a3e635","#ffe066","#ff3d7f"],110);
+  [[100,330,28],[990,330,32],[90,1020,24],[1000,1050,28],[540,290,18]].forEach(p=>sparkle(p[0],p[1],p[2],"#ffffff",.95));grain(.05)},
 stadium(){ctx.fillStyle="#0a6b34";ctx.fillRect(0,0,W,H);for(let i=0;i<14;i++)if(i%2){ctx.fillStyle=rgba("#ffffff",.05);ctx.fillRect(0,i*H/14,W,H/14)}
-  ctx.fillStyle=lin(["rgba(2,40,20,.75)","rgba(2,40,20,0)"],0,0,0,520);ctx.fillRect(0,0,W,520);
-  rays(50,30,18,"#ffffff",.16);rays(1030,30,18,"#ffffff",.16);glow(50,30,260,"#ffffff",.75);glow(1030,30,260,"#ffffff",.75);
-  ctx.strokeStyle=rgba("#ffffff",.38);ctx.lineWidth=6;ctx.beginPath();ctx.arc(540,672,490,0,7);ctx.moveTo(0,672);ctx.lineTo(W,672);ctx.stroke();
-  ctx.strokeRect(-6,1030,W+12,330);ctx.beginPath();ctx.arc(540,1030,120,0,Math.PI);ctx.stroke();
-  [[110,420,16],[980,520,18]].forEach(p=>sparkle(p[0],p[1],p[2],"#ffffff",.85))},
-vol(){ctx.fillStyle=lin(["#0f766e","#115e8a","#0f3d6e"]);ctx.fillRect(0,0,W,H);glow(540,660,720,"#5eead4",.38);geo("#ffffff",.04,120);
-  const r=mulberry(21);for(let i=0;i<22;i++)heart(r()*W,r()*H,14+r()*30,rgba(i%3?"#ffffff":"#ff8f73",.10+r()*.1));
-  heart(110,430,34,rgba("#ff8f73",.95));heart(975,1010,44,rgba("#ff8f73",.95));heart(1000,380,22,rgba("#ffffff",.9));
-  [[90,980,18],[980,700,16]].forEach(p=>sparkle(p[0],p[1],p[2],"#ffffff",.9))}
+  ctx.fillStyle=lin(["rgba(2,40,20,.8)","rgba(2,40,20,0)"],0,0,0,540);ctx.fillRect(0,0,W,540);
+  rays(50,30,18,"#ffffff",.17);rays(1030,30,18,"#ffffff",.17);glow(50,30,280,"#ffffff",.8);glow(1030,30,280,"#ffffff",.8);
+  ctx.strokeStyle=rgba("#ffffff",.38);ctx.lineWidth=6;ctx.beginPath();ctx.arc(540,672,490,0,7);ctx.moveTo(0,672);ctx.lineTo(W,672);ctx.stroke();ctx.strokeRect(-6,1030,W+12,330);ctx.beginPath();ctx.arc(540,1030,120,0,Math.PI);ctx.stroke();
+  bokeh(5,12,["#ffffff"],14,40,.14);[[110,420,16],[980,520,18]].forEach(p=>sparkle(p[0],p[1],p[2],"#ffffff",.85));vignette(.35);grain(.06)},
+vol(){ctx.fillStyle=gl([[0,"#0f766e"],[.5,"#115e8a"],[1,"#0f3d6e"]],0,0,0,H);ctx.fillRect(0,0,W,H);glow(540,660,740,"#5eead4",.42);islamic("#ffffff",.04,150,2);
+  const r=mulberry(21);for(let i=0;i<24;i++)heart(r()*W,r()*H,14+r()*30,rgba(i%3?"#ffffff":"#ff8f73",.10+r()*.12));
+  heart(110,430,34,rgba("#ff8f73",.95));heart(975,1010,44,rgba("#ff8f73",.95));heart(1000,380,22,rgba("#ffffff",.9));heart(70,860,20,rgba("#ffffff",.85));
+  [[90,980,18],[980,700,16]].forEach(p=>sparkle(p[0],p[1],p[2],"#ffffff",.9));vignette(.3);grain(.06)},
+luxe(){ctx.fillStyle=gl([[0,"#010b06"],[.5,"#052917"],[1,"#010b06"]],0,0,0,H);ctx.fillRect(0,0,W,H);
+  glow(540,660,800,"#12804a",.38);glow(540,60,560,"#e6b93c",.32);glow(540,1320,520,"#e6b93c",.22);
+  bokeh(14,26,["#e6b93c","#f5d878"],10,46,.2);
+  ctx.strokeStyle=goldG(0,0,W,H);ctx.lineWidth=4;rr(26,26,W-52,H-52,38);ctx.stroke();ctx.lineWidth=1.5;rr(46,46,W-92,H-92,28);ctx.stroke();
+  [[26,26],[W-26,26],[26,H-26],[W-26,H-26]].forEach(p=>{ctx.fillStyle=goldG(p[0]-20,p[1]-20,p[0]+20,p[1]+20);poly(p[0],p[1],20,4,0);ctx.fill()});
+  [[100,330,20],[985,520,26],[90,1010,18],[995,1010,22]].forEach(p=>sparkle(p[0],p[1],p[2],"#f5d878",.95));vignette(.5);grain(.08)},
+skyline(){ctx.fillStyle=gl([[0,"#0a1740"],[.45,"#3d2a7a"],[.75,"#c4527a"],[1,"#ffa05a"]],0,0,0,1250);ctx.fillRect(0,0,W,H);
+  stars(31,90,0,700,"#ffffff");glow(540,1120,760,"#ffb36b",.55);crescent(AR?160:920,430,62,rgba("#ffe9b0",.95));
+  skyline(1150,"#3a2a78",3,0);ctx.fillStyle="#3a2a78";minaret(AR?900:180,1150,250,"#3a2a78");
+  skyline(1230,"#0b0f2e",7,.35,"#ffd36b");minaret(AR?170:910,1230,200,"#0b0f2e");
+  vignette(.3);grain(.06)},
+zellij(){ctx.fillStyle=gl([[0,"#042f3a"],[.5,"#08596b"],[1,"#042f3a"]],0,0,0,H);ctx.fillRect(0,0,W,H);
+  islamic("#e6b93c",.38,120,2.4,"#ffffff",.12);glow(540,640,720,"#19b3c9",.32);glow(540,1260,520,"#e6b93c",.22);
+  [[90,520,18],[990,300,22],[70,980,20],[980,900,16]].forEach(p=>sparkle(p[0],p[1],p[2],"#f5d878",.9));vignette(.5);grain(.06)},
+med(){ctx.fillStyle=gl([[0,"#0a3a8c"],[.5,"#1491d4"],[1,"#27d3c3"]],0,0,0,H);ctx.fillRect(0,0,W,H);
+  glow(300,200,640,"#7fe3ff",.55);rays(540,-60,28,"#ffffff",.12);bokeh(6,18,["#ffffff","#bff3ff"],14,46,.2);
+  wave(1030,22,420,rgba("#33d6d0",.55),0);wave(1080,26,360,rgba("#1aa6d8",.8),1.4);wave(1140,26,400,rgba("#0e78c0",.92),2.6);wave(1200,24,340,rgba("#0a4f9c",.97),3.8);wave(1262,22,380,"#073577",5);
+  [[100,330,20],[990,420,24],[80,860,16]].forEach(p=>sparkle(p[0],p[1],p[2],"#ffffff",.95));vignette(.28);grain(.06)}
 };
 
 const BOX={x:140,y:272,w:800,h:800,r:48};
 function shapePath(s){const cx=BOX.x+BOX.w/2,cy=BOX.y+BOX.h/2;ctx.beginPath();
   if(s==="circle")ctx.arc(cx,cy,BOX.w/2,0,7);
   else if(s==="round")ctx.roundRect(BOX.x,BOX.y,BOX.w,BOX.h,76);
+  else if(s==="horse"){const R=BOX.w*.52,cyA=BOX.y+R,sx=BOX.w*.46,th=Math.acos(sx/R);ctx.moveTo(cx-sx,BOX.y+BOX.h);ctx.lineTo(cx-sx,cyA+R*Math.sin(th));ctx.arc(cx,cyA,R,Math.PI-th,th,false);ctx.lineTo(cx+sx,BOX.y+BOX.h);ctx.closePath()}
   else if(s==="arch"){ctx.moveTo(BOX.x,BOX.y+BOX.h);ctx.lineTo(BOX.x,BOX.y+BOX.w/2);ctx.arc(cx,BOX.y+BOX.w/2,BOX.w/2,Math.PI,0);ctx.lineTo(BOX.x+BOX.w,BOX.y+BOX.h);ctx.closePath()}
   else poly(cx,cy,BOX.w/2,6,0)}
 function fit(txt,max,size,weight,min){let s=size;for(;;){ctx.font=`${weight} ${s}px Cairo,Tahoma,sans-serif`;if(ctx.measureText(txt).width<=max||s<=min)break;s-=2}return s}
@@ -502,14 +571,17 @@ function header(T){
 
 function frame(T){
   const cx=BOX.x+BOX.w/2,cy=BOX.y+BOX.h/2;
+  if(T.laurel){const g=goldG(0,900,W,1100);laurel(96,1075,470,-1.28,false,g);laurel(984,1075,470,-1.28,true,g)}
   if(T.back){ctx.save();ctx.translate(T.back.dx*(AR?1:-1),T.back.dy);shapePath(T.shape);ctx.fillStyle=T.back.color;ctx.fill();ctx.restore()}
   ctx.save();shapePath(T.shape);sh("rgba(0,0,0,.42)",56,24);ctx.fillStyle="#1b2a4a";ctx.fill();ctx.restore();
   if(T.glow){ctx.save();shapePath(T.shape);ctx.shadowColor=rgba(T.glow,.95);ctx.shadowBlur=70*SC;ctx.lineWidth=30;ctx.strokeStyle=T.glow;ctx.stroke();ctx.restore()}
   ctx.save();shapePath(T.shape);ctx.clip();
   if(img){
-    const base=Math.max(BOX.w/img.width,BOX.h/img.height),s=base*zoom,w=img.width*s,h=img.height*s;
-    const mx=(w-BOX.w)/2,my=(h-BOX.h)/2;ox=Math.max(-mx,Math.min(mx,ox));oy=Math.max(-my,Math.min(my,oy));
-    ctx.drawImage(img,BOX.x+(BOX.w-w)/2+ox,BOX.y+(BOX.h-h)/2+oy,w,h);
+    const PB=T.shape==="horse"?{x:BOX.x-26,y:BOX.y,w:BOX.w+52,h:BOX.h}:BOX;
+    const odd=rot%2===1,iw=odd?img.height:img.width,ih=odd?img.width:img.height;
+    const base=Math.max(PB.w/iw,PB.h/ih),s=base*zoom,w=iw*s,h=ih*s;
+    const mx=(w-PB.w)/2,my=(h-PB.h)/2;ox=Math.max(-mx,Math.min(mx,ox));oy=Math.max(-my,Math.min(my,oy));
+    ctx.save();ctx.translate(PB.x+PB.w/2+ox,PB.y+PB.h/2+oy);ctx.rotate(rot*Math.PI/2);ctx.drawImage(img,-img.width*s/2,-img.height*s/2,img.width*s,img.height*s);ctx.restore();
   }else{
     ctx.fillStyle=lin(["#3a4c86","#17213f"],0,BOX.y,0,BOX.y+BOX.h);ctx.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);
     ctx.fillStyle="rgba(255,255,255,.17)";ctx.beginPath();ctx.arc(cx,cy-100,140,0,7);ctx.fill();ctx.beginPath();ctx.ellipse(cx,cy+330,320,260,0,0,7);ctx.fill();
@@ -519,7 +591,7 @@ function frame(T){
   ctx.lineJoin="round";
   for(const [w,c] of T.ring){shapePath(T.shape);ctx.lineWidth=w;ctx.strokeStyle=fillOf(c,BOX.x,BOX.y,BOX.x+BOX.w,BOX.y+BOX.h);ctx.stroke()}
   let bx,by;
-  if(T.shape==="circle"){bx=cx+283;by=cy-283}else if(T.shape==="arch"){bx=cx+283;by=BOX.y+117}else if(T.shape==="hex"){bx=cx+200;by=cy-346}else{bx=BOX.x+BOX.w-26;by=BOX.y+26}
+  if(T.shape==="circle"){bx=cx+283;by=cy-283}else if(T.shape==="arch"){bx=cx+283;by=BOX.y+117}else if(T.shape==="hex"){bx=cx+200;by=cy-346}else if(T.shape==="horse"){bx=cx+272;by=BOX.y+104}else{bx=BOX.x+BOX.w-26;by=BOX.y+26}
   ctx.save();sh("rgba(0,0,0,.35)",18,6);ctx.fillStyle="#ffffff";ctx.beginPath();ctx.arc(bx,by,58,0,7);ctx.fill();ctx.restore();
   ctx.fillStyle=T.badge;ctx.beginPath();ctx.arc(bx,by,48,0,7);ctx.fill();
   ctx.strokeStyle="#ffffff";ctx.lineWidth=11;ctx.lineCap="round";ctx.lineJoin="round";ctx.beginPath();ctx.moveTo(bx-20,by+1);ctx.lineTo(bx-6,by+16);ctx.lineTo(bx+22,by-15);ctx.stroke();
@@ -581,52 +653,89 @@ cv.onclick=()=>{if(!img)$("file").click()};
 $("file").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   const u=URL.createObjectURL(f),i=new Image();
-  i.onload=()=>{img=i;zoom=1;ox=oy=0;$("zoom").value=1;$("e2").textContent="";$("pick").textContent=t("pick2");draw();renderThumbs()};
+  i.onload=()=>{img=i;zoom=1;rot=0;ox=oy=0;$("zoom").value=1;$("e2").textContent="";$("pick").textContent=t("pick2");draw();renderThumbs()};
   i.src=u;
 };
+$("rotBtn").onclick=()=>{if(!img)return;rot=(rot+1)%4;ox=oy=0;draw();renderThumbs()};
 $("zoom").oninput=e=>{zoom=+e.target.value;draw()};
-let drag=null;
+let drag=null,pinch=null;const ptrs=new Map();
 const kk=()=>cv.width/cv.getBoundingClientRect().width;
-cv.addEventListener("pointerdown",e=>{if(!img)return;drag={x:e.clientX,y:e.clientY,ox,oy};cv.setPointerCapture(e.pointerId);cv.style.cursor="grabbing"});
-cv.addEventListener("pointermove",e=>{if(!drag)return;ox=drag.ox+(e.clientX-drag.x)*kk();oy=drag.oy+(e.clientY-drag.y)*kk();draw()});
-["pointerup","pointercancel"].forEach(ev=>cv.addEventListener(ev,()=>{drag=null;cv.style.cursor="grab"}));
+const setZoom=z=>{zoom=Math.max(1,Math.min(3,z));$("zoom").value=zoom;draw()};
+cv.addEventListener("pointerdown",e=>{if(!img)return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});cv.setPointerCapture(e.pointerId);
+  if(ptrs.size===1){drag={x:e.clientX,y:e.clientY,ox,oy};cv.style.cursor="grabbing"}
+  else if(ptrs.size===2){const [p,q]=[...ptrs.values()];pinch={d:Math.hypot(p.x-q.x,p.y-q.y)||1,z:zoom};drag=null}});
+cv.addEventListener("pointermove",e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size===2&&pinch){const [p,q]=[...ptrs.values()];setZoom(pinch.z*Math.hypot(p.x-q.x,p.y-q.y)/pinch.d)}
+  else if(drag&&ptrs.size===1){ox=drag.ox+(e.clientX-drag.x)*kk();oy=drag.oy+(e.clientY-drag.y)*kk();draw()}});
+const endPtr=e=>{ptrs.delete(e.pointerId);pinch=null;drag=null;if(ptrs.size===1){const [p]=[...ptrs.values()];drag={x:p.x,y:p.y,ox,oy}}cv.style.cursor="grab"};
+["pointerup","pointercancel"].forEach(ev=>cv.addEventListener(ev,endPtr));
+cv.addEventListener("wheel",e=>{if(!img)return;e.preventDefault();setZoom(zoom*(e.deltaY<0?1.06:.94))},{passive:false});
 $("back1").onclick=()=>go(1);
 
 /* الخطوة 3 */
 let blob=null;
+let capV=0,capEdited=false;
 const caption=()=>{
-  const dz=data.country==="DZ",w=dz&&data.wil>=0?wname(data.wil):"",cn=cname(data.country),H=CONFIG.HASHTAGS.join(" "),fm=data.gender===1;
-  if(lang==="ar")return `أنا ${data.name}${dz?(w?" من ولاية "+w:""):" من "+cn} أشارك صورتي مع مجتمع ${CONFIG.ORG_AR}.\n${fm?"سعيدة":"سعيد"} بوجودي بينكم!\n${H}`;
-  if(lang==="fr")return `Je suis ${data.name}${dz?(w?" de la wilaya de "+w:""):" ("+cn+")"} et je partage ma photo avec la communauté du ${CONFIG.ORG_FR}.\n${fm?"Heureuse":"Heureux"} d'être parmi vous !\n${H}`;
-  return `I'm ${data.name}${dz?(w?" from "+w+" Wilaya":""):" from "+cn} and I'm sharing my photo with the ${CONFIG.ORG_EN} community.\nHappy to be among you!\n${H}`;
+  const dz=data.country==="DZ",w=dz&&data.wil>=0?wname(data.wil):"",cn=cname(data.country),H=CONFIG.HASHTAGS.join(" "),fm=data.gender===1,v=capV%3;
+  if(lang==="ar"){const loc=dz?(w?" من ولاية "+w:""):" من "+cn,hp=fm?"سعيدة":"سعيد";
+    return [`أنا ${data.name}${loc} أشارك صورتي مع مجتمع ${CONFIG.ORG_AR}.\n${hp} بوجودي بينكم!\n${H}`,
+      `${data.name}${loc}\n${hp} بوجودي بينكم! أشارك صورتي مع مجتمع ${CONFIG.ORG_AR} وأدعوكم إلى المشاركة.\n${H}`,
+      `أفتخر بالانتماء إلى مجتمع ${CONFIG.ORG_AR} ✨\nأنا ${data.name}${loc}.\n${H}`][v]}
+  if(lang==="fr"){const loc=dz?(w?" de la wilaya de "+w:""):" ("+cn+")",hp=fm?"Heureuse":"Heureux";
+    return [`Je suis ${data.name}${loc} et je partage ma photo avec la communauté du ${CONFIG.ORG_FR}.\n${hp} d'être parmi vous !\n${H}`,
+      `${data.name}${loc}\n${hp} d'être parmi vous ! Je partage ma photo avec la communauté du ${CONFIG.ORG_FR}. Rejoignez-nous !\n${H}`,
+      `${fm?"Fière":"Fier"} d'appartenir à la communauté du ${CONFIG.ORG_FR} ✨\n${data.name}${loc}\n${H}`][v]}
+  const loc=dz?(w?" from "+w+" Wilaya":""):" from "+cn;
+  return [`I'm ${data.name}${loc} and I'm sharing my photo with the ${CONFIG.ORG_EN} community.\nHappy to be among you!\n${H}`,
+    `${data.name}${loc}\nHappy to be among you! Sharing my photo with the ${CONFIG.ORG_EN} community. Join us!\n${H}`,
+    `Proud to be part of the ${CONFIG.ORG_EN} community ✨\n${data.name}${loc}\n${H}`][v];
 };
+const setCap=()=>{if(!capEdited)$("caption").value=caption()};
+const curCap=()=>$("caption").value.trim()||caption();
+$("caption").addEventListener("input",()=>{capEdited=true});
+$("capNext").onclick=()=>{capV++;capEdited=false;setCap()};
+let art=null,fmt="45";
+function blurStretch(k,src,sx,sy,sw,sh,tw,th,dx,dy,dw,dh){const t=document.createElement("canvas");t.width=tw;t.height=th;t.getContext("2d").drawImage(src,sx,sy,sw,sh,0,0,tw,th);k.drawImage(t,0,0,tw,th,dx,dy,dw,dh)}
+function composeFormat(){
+  if(fmt==="45")return art;
+  const OW=2160,OH=fmt==="11"?2160:3840,out=document.createElement("canvas");out.width=OW;out.height=OH;
+  const k=out.getContext("2d");k.imageSmoothingEnabled=true;k.imageSmoothingQuality="high";
+  if(fmt==="11"){const sc=OH/art.height,aw=art.width*sc,ax=(OW-aw)/2;
+    blurStretch(k,art,0,0,8,art.height,2,24,0,0,ax+3,OH);blurStretch(k,art,art.width-8,0,8,art.height,2,24,ax+aw-3,0,ax+3,OH);k.drawImage(art,ax,0,aw,OH)}
+  else{const ay=(OH-art.height)/2;
+    blurStretch(k,art,0,0,art.width,8,24,2,0,0,OW,ay+3);blurStretch(k,art,0,art.height-8,art.width,8,24,2,0,ay+art.height-3,OW,ay+3);k.drawImage(art,0,ay)}
+  return out}
+function showBlob(b,first){blob=b;$("result").src=URL.createObjectURL(b);
+  if(first){capEdited=false;setCap();go(3)}}
+function buildFormats(){$("fmts").innerHTML=[["45","fmtPost"],["11","fmtSquare"],["916","fmtStory"]].map(([k,n])=>`<span class="chip${k===fmt?" on":""}" data-f="${k}">${t(n)}</span>`).join("")}
+$("fmts").onclick=e=>{const c=e.target.closest(".chip");if(!c||!art)return;fmt=c.dataset.f;buildFormats();
+  $("busy").classList.remove("hidden");setTimeout(()=>{try{composeFormat().toBlob(b=>{$("busy").classList.add("hidden");if(b)showBlob(b,false)},"image/jpeg",0.95)}catch(err){$("busy").classList.add("hidden");say(t("errMake"))}},50)};
 $("to3").onclick=()=>{
   if(!img){$("e2").textContent=t("errPhoto");return}
-  try{
-    draw();
-    cv.toBlob(b=>{
-      if(!b){$("e2").textContent=t("errMake");return}
-      blob=b;$("result").src=URL.createObjectURL(b);$("caption").textContent=caption();save();go(3);
-    },"image/jpeg",0.92);
-  }catch(err){console.error(err);$("e2").textContent=t("errMake")+" ("+err.name+")"}
+  $("e2").textContent="";$("busy").classList.remove("hidden");
+  setTimeout(()=>{
+    const fail=err=>{if(err)console.error(err);$("busy").classList.add("hidden");$("e2").textContent=t("errMake")+(err&&err.name?" ("+err.name+")":"")};
+    try{
+      draw();fmt="45";
+      art=document.createElement("canvas");art.width=2160;art.height=2700;
+      const bk=art.getContext("2d");bk.setTransform(2,0,0,2,0,0);scene(bk,tpl,2);
+      buildFormats();
+      art.toBlob(b=>{$("busy").classList.add("hidden");if(b)showBlob(b,true);else cv.toBlob(b2=>{if(b2)showBlob(b2,true);else fail()},"image/jpeg",0.92)},"image/jpeg",0.95);
+    }catch(err){
+      try{art=null;draw();$("busy").classList.add("hidden");cv.toBlob(b2=>{if(b2){buildFormats();showBlob(b2,true)}else fail()},"image/jpeg",0.92)}catch(e2){fail(e2)}
+    }
+  },60);
 };
-function save(){
-  if(!CONFIG.WEBHOOK_URL)return;
-  const rec={date:new Date().toISOString(),name:data.name,country:data.country+" "+cname(data.country),wilaya:data.wil>=0?String(data.wil+1).padStart(2,"0")+" "+WAR[data.wil]:"",
-    age:data.age>=0?AGES[data.age].ar:"",gender:data.gender>=0?GENDERS[data.gender].ar:"",roles:data.roles.map(i=>ROLES[i].other?(data.otherRole||"أخرى"):ROLES[i].ar).join("، "),work:data.work,
-    template:TPLS[tpl].n,slogan:data.custom||(data.slogan>=0?SLOGANS[data.slogan].ar:""),lang};
-  fetch(CONFIG.WEBHOOK_URL,{method:"POST",mode:"no-cors",body:JSON.stringify(rec)}).catch(()=>{});
-}
 function say(m){const e=$("msg");e.textContent=m;e.classList.remove("hidden")}
 function download(){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="diwan-"+Date.now()+".jpg";a.click()}
 $("dl").onclick=()=>{download();say(t("msgDl"))};
-$("copy").onclick=async()=>{try{await navigator.clipboard.writeText(caption());say(t("msgCopy"))}catch(e){say(t("msgCopyFail"))}};
+$("copy").onclick=async()=>{try{await navigator.clipboard.writeText(curCap());say(t("msgCopy"))}catch(e){say(t("msgCopyFail"))}};
 $("openGroup").onclick=()=>window.open(CONFIG.GROUP_URL,"_blank");
 $("share").onclick=async()=>{
   const file=new File([blob],"diwan.jpg",{type:"image/jpeg"});
-  try{await navigator.clipboard.writeText(caption())}catch(e){}
+  try{await navigator.clipboard.writeText(curCap())}catch(e){}
   if(navigator.canShare&&navigator.canShare({files:[file]})){
-    try{await navigator.share({files:[file],text:caption()});say(t("msgShare"));return}catch(e){if(e.name==="AbortError")return}
+    try{await navigator.share({files:[file],text:curCap()});say(t("msgShare"));return}catch(e){if(e.name==="AbortError")return}
   }
   download();window.open(CONFIG.GROUP_URL,"_blank");say(t("msgFb"));
 };
