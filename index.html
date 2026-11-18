@@ -50,6 +50,12 @@ textarea.caption{width:100%;border:2px solid #ece8f4;font:inherit;resize:vertica
 .row{display:flex;gap:10px}.row .btn{margin-top:10px}
 .err{color:#d6336c;font-size:13px;margin-top:6px;min-height:18px}
 .hidden{display:none!important}
+.thumbs{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.thumbs div{position:relative;width:72px;height:72px}.thumbs img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+.thumbs b{position:absolute;top:-7px;inset-inline-end:-7px;background:#d6336c;color:#fff;width:22px;height:22px;border-radius:50%;text-align:center;line-height:22px;cursor:pointer;font-size:13px}
+.thumbs div.sel img{outline:3px solid #ff5a36;outline-offset:2px}
+.linkbtn{background:none;border:0;color:#6e6b85;text-decoration:underline;cursor:pointer;font:inherit;font-size:13px;margin-top:12px;padding:0;display:block}
+.orgrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.orgrow img{width:48px;height:48px;border-radius:50%;object-fit:contain;background:#fff;border:1px solid #ddd}
+.orgrow .btn{width:auto;margin-top:0;padding:12px 16px}
 canvas{width:100%;border-radius:22px;background:#eee;touch-action:none;cursor:grab;display:block}
 .tpls{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 14px}
 .tpl{flex:0 0 auto;width:90px;text-align:center;font-size:12px;font-weight:700;cursor:pointer}
@@ -84,21 +90,31 @@ aside h1{font-size:20px;margin:14px 0 10px}.steps{flex-direction:row}.step{flex:
 <main><div class="panel">
 
 <section id="s1" class="card">
+  <div class="ok hidden" id="hint"><span data-i="hintTxt"></span><br><button type="button" class="linkbtn" id="hintOk" data-i="hintOk" style="margin-top:6px"></button></div>
   <h2 data-i="c1h"></h2><p class="sub" data-i="c1sub"></p>
-  <label data-i="lName"></label><input type="text" id="fName" maxlength="40" data-p="pName">
+  <label data-i="lMode" style="margin-top:0"></label><div class="chips" id="modes"></div>
+  <label data-i="lName" id="lblName"></label><input type="text" id="fName" maxlength="70" data-p="pName">
   <label data-i="lCountry"></label>
   <div class="cwrap"><select id="fCountry"></select><img id="flagPrev" alt="" class="hidden"></div>
   <div id="wilayaWrap"><label data-i="lWilaya"></label><select id="fWilaya"></select></div>
+  <div id="personalFields">
   <label data-i="lAge"></label><select id="fAge"></select>
   <label data-i="lGender"></label><select id="fGender"></select>
   <label data-i="lRole"></label><div class="chips" id="roles"></div>
-  <input type="text" id="fOther" maxlength="30" class="hidden" data-p="pOther" style="margin-top:10px">
-  <label data-i="lWork"></label><input type="text" id="fWork" maxlength="45" data-p="pWork">
+  <input type="text" id="fOther" maxlength="60" class="hidden" data-p="pOther" style="margin-top:10px">
+  <label data-i="lWork"></label><input type="text" id="fWork" maxlength="90" data-p="pWork">
+  </div>
+  <label data-i="lEvent"></label><input type="text" id="fEvent" maxlength="70" data-p="pEvent">
+  <label data-i="lOrgLogo"></label>
+  <div class="orgrow"><button type="button" class="btn sec" id="orgPick" data-i="orgLogoPick"></button><img id="orgPrev" class="hidden" alt=""><button type="button" class="btn sec hidden" id="orgDel" data-i="orgLogoDel"></button></div>
+  <input type="file" id="orgFile" accept="image/*" class="hidden">
   <label data-i="lSlogan"></label><select id="fSlogan"></select>
-  <label data-i="lCustom"></label><input type="text" id="fCustom" maxlength="40" data-p="pCustom">
+  <label data-i="lCustom"></label><input type="text" id="fCustom" maxlength="80" data-p="pCustom">
+  <div class="ok" style="font-weight:600;font-size:13px;line-height:1.7" data-i="privacy"></div>
   <label class="consent"><input type="checkbox" id="fConsent"><span data-i="consent"></span></label>
   <div class="err" id="e1"></div>
   <button class="btn" id="to2" data-i="next"></button>
+  <button type="button" class="linkbtn" id="clearProf" data-i="clearProfile"></button>
 </section>
 
 <section id="s2" class="card hidden">
@@ -106,9 +122,15 @@ aside h1{font-size:20px;margin:14px 0 10px}.steps{flex-direction:row}.step{flex:
   <label style="margin-top:0" data-i="lTpl"></label>
   <div class="tpls" id="tpls"></div>
   <canvas id="cv" width="1080" height="1350"></canvas>
-  <label data-i="lZoom"></label><input type="range" id="zoom" min="1" max="3" step="0.01" value="1">
+  <div id="zoomWrap"><label data-i="lZoom"></label><input type="range" id="zoom" min="1" max="3" step="0.01" value="1"></div>
+  <label data-i="lStk"></label><div class="chips" id="stkChips"></div>
+  <div class="row hidden" id="stkCtl"><button class="btn sec" id="stkBig" style="padding:10px">＋</button><button class="btn sec" id="stkSmall" style="padding:10px">－</button><button class="btn sec" id="stkDel" style="padding:10px">🗑</button></div>
+  <p class="sub" style="margin:6px 0 0;font-size:12px" data-i="stkHint"></p>
+  <label class="consent" style="margin-top:12px"><input type="checkbox" id="enh"><span data-i="enh"></span></label>
   <input type="file" id="file" accept="image/*" class="hidden">
-  <div class="row"><button class="btn" id="pick"></button><button class="btn sec" id="rotBtn" data-i="rot" style="flex:0 0 auto;width:auto;padding:16px 20px;margin-top:20px"></button></div>
+  <input type="file" id="teamFile" accept="image/*" multiple class="hidden">
+  <div id="teamBox" class="hidden"><button class="btn" id="teamAdd" data-i="teamAdd"></button><p class="sub" style="margin:8px 0 0" data-i="teamHint"></p><div class="thumbs" id="teamThumbs"></div></div>
+  <div class="row" id="soloRow"><button class="btn" id="pick"></button><button class="btn sec" id="rotBtn" data-i="rot" style="flex:0 0 auto;width:auto;padding:16px 20px;margin-top:20px"></button></div>
   <div class="err" id="e2"></div>
   <div class="row"><button class="btn sec" id="back1" data-i="back"></button><button class="btn navy" id="to3" data-i="make"></button></div>
 </section>
@@ -119,7 +141,9 @@ aside h1{font-size:20px;margin:14px 0 10px}.steps{flex-direction:row}.step{flex:
   <label data-i="lFormat" style="margin-top:14px"></label><div class="chips" id="fmts"></div>
   <div class="row"><button class="btn sec" id="back2" data-i="back2"></button><button class="btn sec" id="dl" data-i="dl"></button></div>
   <button class="btn" id="share" data-i="share"></button>
+  <button class="btn sec hidden" id="copyImg" data-i="copyImg"></button>
   <button class="btn navy" id="openGroup" data-i="openGroup"></button>
+  <button class="btn sec" id="newBtn" data-i="newBtn"></button>
   <div class="ok hidden" id="msg"></div>
   <p class="sub" style="margin-top:18px" data-i="postHint"></p>
   <div class="tags" id="tags"></div>
@@ -233,7 +257,30 @@ const TPLS=[
   plate:{fill:["#ffffff","#e3f4f7"],border:[5,"gold"],tx:"#0a4a5a"},pill:{fill:"gold",tx:"#06323d"}},
  {id:"med",n:{ar:"زرقة المتوسط",fr:"Méditerranée",en:"Mediterranean"},bg:"med",shape:"circle",ring:[[34,"#ffffff"],[12,"#7fe3ff"]],glow:"#7fe3ff",
   head:"#ffffff",hshadow:1,sub:"#e1f6ff",badge:"#ff7a3d",orn:"#ffffff",sw:"linear-gradient(#0a3a8c,#1491d4 55%,#27d3c3)",
-  plate:{fill:["#ffffff","#e4f7ff"],border:[5,"#7fe3ff"],tx:"#0a3a8c"},pill:{fill:["#ff9a5a","#ff6a3d"],tx:"#ffffff"}}
+  plate:{fill:["#ffffff","#e4f7ff"],border:[5,"#7fe3ff"],tx:"#0a3a8c"},pill:{fill:["#ff9a5a","#ff6a3d"],tx:"#ffffff"}},
+ {id:"jul5",n:{ar:"5 جويلية",fr:"5 Juillet",en:"5 July"},bg:"jul5",shape:"circle",ring:[[42,"#ffffff"],[26,"#d21034"],[10,"#ffffff"]],glow:"#7dffb2",
+  head:"#ffffff",hshadow:1,sub:"#d9f5e3",badge:"#d21034",orn:"#ffffff",sw:"linear-gradient(135deg,#064a24,#ffffff 55%,#d21034)",
+  plate:{fill:["#ffffff","#eaf5ee"],border:[5,"#d21034"],tx:"#0b5d2e"},pill:{fill:["#e8203f","#b80d2c"],tx:"#ffffff"},
+  tag:{ar:"ذكرى الاستقلال 5 جويلية 1962",fr:"Fête de l'indépendance · 5 juillet 1962",en:"Independence Day · 5 July 1962"}},
+ {id:"ramadan",n:{ar:"رمضان كريم",fr:"Ramadan",en:"Ramadan"},bg:"ramadan",shape:"arch",ring:[[36,"gold"],[12,"#fff4c9"],[7,"gold"]],glow:"#ffd37a",
+  head:"#ffffff",hshadow:1,sub:"#ece4ff",badge:"#e6b93c",orn:"#ffd37a",sw:"linear-gradient(#0b1240,#2a1470 60%,#ffd37a)",
+  plate:{fill:["#1b1160","#0d0838"],border:[4,"gold"],tx:"#ffe9b0"},pill:{fill:"gold",tx:"#2b1e00"},
+  tag:{ar:"رمضان كريم",fr:"Ramadan Karim",en:"Ramadan Kareem"}},
+ {id:"clean",n:{ar:"أبيض نظيف",fr:"Blanc épuré",en:"Clean White"},bg:"clean",shape:"round",ring:[[26,"#ffffff"],[8,"#0f3d6e"]],
+  head:"#0f3d6e",hshadow:0,sub:"#33445f",badge:"#10a88a",orn:"#1c7ed6",sw:"linear-gradient(135deg,#ffffff,#dce6f5 60%,#0f3d6e)",dv:"#0f3d6e",
+  plate:{fill:["#12457e","#0b2c55"],border:[3,"#ffffff"],tx:"#ffffff"},pill:{fill:["#10a88a","#0b8a70"],tx:"#ffffff"}},
+ {id:"tech",n:{ar:"تكنولوجيا",fr:"Tech",en:"Tech"},bg:"tech",shape:"round",ring:[[34,"rgba(0,229,255,.25)"],[8,"#00e5ff"]],glow:"#22ff9a",
+  head:"#ffffff",hshadow:1,sub:"#bff3ff",badge:"#22c55e",orn:"#00e5ff",sw:"linear-gradient(135deg,#030816,#0a3a5c 55%,#22ff9a)",
+  plate:{fill:["rgba(3,18,38,.92)","rgba(7,40,70,.92)"],border:[3,"#00e5ff"],tx:"#ffffff"},pill:{fill:["#00e5ff","#22ff9a"],tx:"#04101f"},
+  tag:{ar:"مبتكر في مجتمع الديوان",arW:"مبتكرة في مجتمع الديوان",fr:"Innovateur de la communauté du Diwan",frW:"Innovatrice de la communauté du Diwan",en:"Innovator of the Diwan community"}},
+ {id:"track",n:{ar:"مضمار",fr:"Piste",en:"Track"},bg:"track",shape:"circle",ring:[[38,"#ffffff"],[12,"#ffd23f"]],glow:"#ffb347",
+  head:"#ffffff",hshadow:1,sub:"#ffe9d6",badge:"#0f3d6e",orn:"#ffd23f",sw:"linear-gradient(#b83a14,#e0561f 60%,#ffffff)",
+  plate:{skew:1,fill:["#13265e","#0a1433"],border:[4,"#ffd23f"],tx:"#ffffff"},pill:{fill:["#ffffff","#ffe9d6"],tx:"#9a2f0d"},
+  tag:{ar:"رياضة • شباب • إنجاز",fr:"Sport • Jeunesse • Réussite",en:"Sport • Youth • Achievement"}},
+ {id:"eco",n:{ar:"بيئة خضراء",fr:"Éco vert",en:"Green Eco"},bg:"eco",shape:"hex",ring:[[44,"#ffffff"],[10,"#e6ff8a"]],glow:"#b6f5c4",
+  head:"#ffffff",hshadow:1,sub:"#e6fbe9",badge:"#0f766e",orn:"#e6ff8a",sw:"linear-gradient(#0b6b3a,#119a54 60%,#e6ff8a)",
+  plate:{fill:["#ffffff","#e8f9ed"],border:[5,"#38b56a"],tx:"#0b5d2e"},pill:{fill:["#e6ff8a","#b6e63a"],tx:"#0b4a22"},
+  tag:{ar:"من أجل بيئة نظيفة",fr:"Pour un environnement propre",en:"For a clean environment"}}
 ];
 const TPL_ROLE={young:6,athlete:3,vol:8,pres:1,staff:0,coach:7};
 
@@ -247,6 +294,10 @@ ar:{org:CONFIG.ORG_AR,brandSub:"",h1:"شارك صورتك مع مجموعة ال
  pick:"📷 اختر صورة",pick2:"📷 تغيير الصورة",back:"→ رجوع",make:"إنشاء الصورة ←",
  c3h:"شكراً لك! 🎉",c3sub:"صورتك جاهزة للمشاركة في مجموعة الديوان.",back2:"تغيير الصورة",dl:"⬇ تحميل",share:"مشاركة",openGroup:"فتح مجموعة الديوان على فيسبوك",
  postHint:"انشر الصورة في المجموعة مع التعليق والوسوم:",copy:"نسخ التعليق والوسوم",
+ lMode:"نوع المشاركة",modeSolo:"👤 صورة شخصية",modeTeam:"👥 صورة فريق / جمعية",lNameTeam:"اسم الفريق أو الجمعية",pNameTeam:"مثال: جمعية الأمل الشبابية",lEvent:"اسم الفعالية / المناسبة (اختياري)",pEvent:"مثال: الملتقى الوطني للشباب",lOrgLogo:"شعار مؤسستك أو جمعيتك (اختياري)",orgLogoPick:"🖼️ اختر الشعار",orgLogoDel:"✕ إزالة",teamAdd:"➕ أضف صورة أو أكثر (حتى 4 صور)",teamHint:"صورة واحدة تكفي. وإن أضفت أكثر (حتى 4) فتُرتَّب تلقائياً في كولاج داخل الإطار.",errTeam:"أضف صورة واحدة على الأقل.",copyImg:"📋 نسخ الصورة",msgImgCopy:"تم نسخ الصورة ✓ الصقها (Ctrl+V) في منشور المجموعة.",msgImgCopyFail:"تعذّر نسخ الصورة، تم تحميلها بدلاً من ذلك.",privacy:"🔒 صورتك لا تغادر جهازك: تُصمَّم الصورة داخل متصفحك فقط، ولا تُرفع ولا تُحفظ في أي خادم. نتذكّر بياناتك النصية على هذا الجهاز فقط لتسهيل المرة القادمة.",clearProfile:"🗑️ مسح بياناتي المحفوظة على هذا الجهاز",msgCleared:"تم مسح البيانات المحفوظة.",pillTeam:"سعداء بوجودنا بينكم",
+ lStk:"ملصقات (اختياري)",stkHint:"اضغط لإضافة ملصق ثم اسحبه فوق الصورة. ＋ و － لتغيير الحجم، 🗑 للحذف.",
+ enh:"✨ تحسين الإضاءة والألوان تلقائياً",hintTxt:"👋 أهلاً بك! ثلاث خطوات بسيطة: ① أدخل بياناتك ② اختر القالب وأضف صورتك ③ أنشئ الصورة وشاركها في المجموعة.",hintOk:"فهمت ✓",
+ newBtn:"🔄 جديد (العودة للصفحة الرئيسية)",
  errName:"يرجى إدخال الاسم واللقب.",errConsent:"يرجى الموافقة على استعمال بياناتك وصورتك.",errPhoto:"يرجى اختيار صورة أولاً.",errMake:"تعذر إنشاء الصورة، أعد المحاولة.",
  msgDl:"تم تحميل الصورة.",msgShare:"اختر فيسبوك ثم مجموعة الديوان لنشر الصورة.",msgFb:"تم تحميل الصورة ونسخ التعليق. ألصق التعليق وأرفق الصورة في مجموعة الديوان.",
  msgCopy:"تم نسخ التعليق والوسوم ✓",msgCopyFail:"انسخ التعليق يدوياً من الأعلى.",
@@ -261,6 +312,10 @@ fr:{org:CONFIG.ORG_FR,brandSub:"",h1:"Partagez votre photo avec le groupe du Diw
  pick:"📷 Choisir une photo",pick2:"📷 Changer la photo",back:"← Retour",make:"Créer l'image →",
  c3h:"Merci ! 🎉",c3sub:"Votre image est prête à être partagée dans le groupe du Diwan.",back2:"Changer la photo",dl:"⬇ Télécharger",share:"Partager",openGroup:"Ouvrir le groupe Facebook du Diwan",
  postHint:"Publiez l'image dans le groupe avec ce texte et ces hashtags :",copy:"Copier le texte et les hashtags",
+ lMode:"Type de participation",modeSolo:"👤 Photo individuelle",modeTeam:"👥 Photo d'équipe / association",lNameTeam:"Nom de l'équipe ou de l'association",pNameTeam:"Ex. : Association Al Amal",lEvent:"Nom de l'événement (facultatif)",pEvent:"Ex. : Rencontre nationale de la jeunesse",lOrgLogo:"Logo de votre structure (facultatif)",orgLogoPick:"🖼️ Choisir le logo",orgLogoDel:"✕ Retirer",teamAdd:"➕ Ajouter une ou plusieurs photos (jusqu'à 4)",teamHint:"Une seule photo suffit. Si vous en ajoutez plusieurs (jusqu'à 4), elles forment un collage dans le cadre.",errTeam:"Ajoutez au moins une photo.",copyImg:"📋 Copier l'image",msgImgCopy:"Image copiée ✓ Collez-la (Ctrl+V) dans la publication du groupe.",msgImgCopyFail:"Copie impossible : l'image a été téléchargée.",privacy:"🔒 Votre photo ne quitte pas votre appareil : l'image est créée dans votre navigateur, sans envoi ni stockage sur un serveur. Vos données texte sont mémorisées sur cet appareil uniquement, pour gagner du temps la prochaine fois.",clearProfile:"🗑️ Effacer mes données enregistrées sur cet appareil",msgCleared:"Données enregistrées effacées.",pillTeam:"Heureux d'être parmi vous",
+ lStk:"Autocollants (facultatif)",stkHint:"Touchez pour ajouter, puis faites glisser sur la photo. ＋ et － pour la taille, 🗑 pour supprimer.",
+ enh:"✨ Améliorer lumière et couleurs automatiquement",hintTxt:"👋 Bienvenue ! Trois étapes simples : ① Saisissez vos informations ② Choisissez le modèle et ajoutez votre photo ③ Créez l'image et partagez-la dans le groupe.",hintOk:"Compris ✓",
+ newBtn:"🔄 Nouveau (retour à l'accueil)",
  errName:"Veuillez saisir votre nom et prénom.",errConsent:"Veuillez accepter l'utilisation de vos données et de votre photo.",errPhoto:"Veuillez d'abord choisir une photo.",errMake:"Impossible de créer l'image, réessayez.",
  msgDl:"Image téléchargée.",msgShare:"Choisissez Facebook puis le groupe du Diwan pour publier l'image.",msgFb:"Image téléchargée et texte copié. Collez le texte et joignez l'image dans le groupe du Diwan.",
  msgCopy:"Texte et hashtags copiés ✓",msgCopyFail:"Copiez le texte manuellement ci-dessus.",
@@ -275,6 +330,10 @@ en:{org:CONFIG.ORG_EN,brandSub:"",h1:"Share your photo with the Diwan group",st1
  pick:"📷 Choose a photo",pick2:"📷 Change photo",back:"← Back",make:"Create image →",
  c3h:"Thank you! 🎉",c3sub:"Your image is ready to be shared in the Diwan group.",back2:"Change photo",dl:"⬇ Download",share:"Share",openGroup:"Open the Diwan Facebook group",
  postHint:"Post the image in the group with this text and hashtags:",copy:"Copy text and hashtags",
+ lMode:"Participation type",modeSolo:"👤 Solo photo",modeTeam:"👥 Team / association photo",lNameTeam:"Team or association name",pNameTeam:"E.g.: Al Amal Youth Association",lEvent:"Event name (optional)",pEvent:"E.g.: National Youth Forum",lOrgLogo:"Your organization's logo (optional)",orgLogoPick:"🖼️ Choose logo",orgLogoDel:"✕ Remove",teamAdd:"➕ Add one or more photos (up to 4)",teamHint:"One photo is enough. If you add more (up to 4), they form a collage inside the frame.",errTeam:"Add at least one photo.",copyImg:"📋 Copy image",msgImgCopy:"Image copied ✓ Paste (Ctrl+V) into the group post.",msgImgCopyFail:"Couldn't copy; the image was downloaded instead.",privacy:"🔒 Your photo never leaves your device: the image is created in your browser, with nothing uploaded or stored on a server. Your text details are remembered on this device only, to save time next time.",clearProfile:"🗑️ Clear my data saved on this device",msgCleared:"Saved data cleared.",pillTeam:"Happy to be among you",
+ lStk:"Stickers (optional)",stkHint:"Tap to add a sticker, then drag it on the photo. ＋ and － resize, 🗑 deletes.",
+ enh:"✨ Auto-enhance light and colors",hintTxt:"👋 Welcome! Three simple steps: ① Enter your details ② Pick a template and add your photo ③ Create the image and share it in the group.",hintOk:"Got it ✓",
+ newBtn:"🔄 New (back to home)",
  errName:"Please enter your full name.",errConsent:"Please agree to the use of your data and photo.",errPhoto:"Please choose a photo first.",errMake:"Could not create the image, please try again.",
  msgDl:"Image downloaded.",msgShare:"Choose Facebook, then the Diwan group, to post the image.",msgFb:"Image downloaded and text copied. Paste the text and attach the image in the Diwan group.",
  msgCopy:"Text and hashtags copied ✓",msgCopyFail:"Please copy the text manually from above.",
@@ -287,8 +346,10 @@ document.querySelector(".brand img").src=LOGO_DATA;
 if(!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){r=Math.min(r,w/2,h/2);this.moveTo(x+r,y);this.arcTo(x+w,y,x+w,y+h,r);this.arcTo(x+w,y+h,x,y+h,r);this.arcTo(x,y+h,x,y,r);this.arcTo(x,y,x+w,y,r);this.closePath()};
 let lang=(()=>{try{const v=localStorage.getItem("diwan_lang");return["ar","fr","en"].includes(v)?v:"ar"}catch(e){return"ar"}})();
 const t=k=>L[lang][k];
-const data={country:"DZ",otherRole:"",custom:"",name:"",wil:-1,age:-1,gender:-1,roles:[],work:"",slogan:-1};
+const data={mode:"solo",event:"",country:"DZ",otherRole:"",custom:"",name:"",wil:-1,age:-1,gender:-1,roles:[],work:"",slogan:-1};
 let tpl=0,manualTpl=false;
+let orgLogo=null,orgData="";const timgs=[];let tsel=0,cellRects=[];
+const PROF="diwan_profile";
 const selRoles=new Set();
 
 function buildCountries(){
@@ -318,6 +379,7 @@ function build(){
 }
 function applyLang(){
   document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+  syncMode();
   document.querySelectorAll("[data-i]").forEach(e=>e.textContent=t(e.dataset.i));
   document.querySelectorAll("[data-p]").forEach(e=>e.placeholder=t(e.dataset.p));
   if(typeof buildFormats==="function")buildFormats();
@@ -326,6 +388,59 @@ function applyLang(){
   build();draw();renderThumbs();
   if(blob)setCap();
 }
+const isTeam=()=>data.mode==="team";
+function syncMode(){
+  stkUI();
+  const tm=isTeam();
+  $("lblName").dataset.i=tm?"lNameTeam":"lName";$("fName").dataset.p=tm?"pNameTeam":"pName";
+  $("personalFields").classList.toggle("hidden",tm);
+  $("modes").innerHTML=[["solo","modeSolo"],["team","modeTeam"]].map(([k,n])=>`<span class="chip${k===data.mode?" on":""}" data-m="${k}">${t(n)}</span>`).join("");
+  $("pick").classList.toggle("hidden",tm);$("teamBox").classList.toggle("hidden",!tm);
+  drawTeamThumbs();
+}
+function drawTeamThumbs(){
+  if(tsel>=timgs.length)tsel=Math.max(0,timgs.length-1);
+  $("teamThumbs").innerHTML=timgs.map((im,i)=>`<div data-s="${i}" class="${i===tsel&&timgs.length>1?"sel":""}"><img src="${im.src}" alt=""><b data-k="${i}">×</b></div>`).join("");
+  $("teamAdd").style.display=timgs.length>=4?"none":"";
+}
+$("modes").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;data.mode=c.dataset.m;applyLang()};
+$("teamAdd").onclick=()=>$("teamFile").click();
+$("teamFile").onchange=e=>{
+  const fs=[...e.target.files].slice(0,4-timgs.length);e.target.value="";
+  fs.forEach(f=>{const i=new Image();i.onload=()=>{if(timgs.length<4){i._z=1;i._r=0;i._ox=0;i._oy=0;timgs.push(i);tsel=timgs.length-1;$("zoom").value=1;$("e2").textContent="";drawTeamThumbs();draw();renderThumbs()}};i.src=URL.createObjectURL(f)});
+};
+$("teamThumbs").onclick=e=>{const b=e.target.closest("b");
+  if(b){timgs.splice(+b.dataset.k,1);drawTeamThumbs();$("zoom").value=getZ();draw();renderThumbs();return}
+  const d=e.target.closest("div[data-s]");if(d){tsel=+d.dataset.s;drawTeamThumbs();$("zoom").value=getZ();draw()}};
+
+/* شعار الجمعية */
+function setOrgLogo(im,url){orgLogo=im;orgData=url||"";const pv=$("orgPrev");
+  if(im){pv.src=url;pv.classList.remove("hidden");$("orgDel").classList.remove("hidden")}else{pv.removeAttribute("src");pv.classList.add("hidden");$("orgDel").classList.add("hidden")}
+  draw();renderThumbs()}
+$("orgPick").onclick=()=>$("orgFile").click();
+$("orgDel").onclick=()=>setOrgLogo(null,"");
+$("orgFile").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
+  const i=new Image();i.onload=()=>{const m=256,k=Math.min(m/i.width,m/i.height,1),c=document.createElement("canvas");c.width=Math.max(1,Math.round(i.width*k));c.height=Math.max(1,Math.round(i.height*k));
+    c.getContext("2d").drawImage(i,0,0,c.width,c.height);let u="";try{u=c.toDataURL("image/png")}catch(x){}setOrgLogo(c,u)};i.src=URL.createObjectURL(f)};
+
+/* تذكّر البيانات على الجهاز */
+function saveProfile(){try{localStorage.setItem(PROF,JSON.stringify({name:data.name,country:data.country,wil:data.wil,age:data.age,gender:data.gender,roles:data.roles,otherRole:data.otherRole,work:data.work,slogan:data.slogan,custom:data.custom,org:orgData.length<400000?orgData:""}))}catch(e){}}
+function loadProfile(){
+  let p=null;try{p=JSON.parse(localStorage.getItem(PROF)||"null")}catch(e){}
+  if(!p)return;
+  if(typeof p.name==="string")$("fName").value=p.name;
+  if(p.country&&CODES.includes(p.country)){$("fCountry").value=p.country;syncCountry()}
+  const sv=(id,v)=>{if(v!==undefined&&v!==null&&v>=0)$(id).value=v};
+  sv("fWilaya",p.wil);sv("fAge",p.age);sv("fGender",p.gender);sv("fSlogan",p.slogan);
+  data.gender=$("fGender").value===""?-1:+$("fGender").value;
+  selRoles.clear();(p.roles||[]).forEach(r=>{if(ROLES[r])selRoles.add(r)});
+  $("fOther").value=p.otherRole||"";$("fWork").value=p.work||"";$("fCustom").value=p.custom||"";
+  build();
+  if(typeof p.org==="string"&&p.org.startsWith("data:image/")){const i=new Image();i.onload=()=>setOrgLogo(i,p.org);i.src=p.org}
+}
+$("clearProf").onclick=()=>{try{localStorage.removeItem(PROF)}catch(e){}
+  ["fName","fWork","fOther","fCustom","fAge","fGender","fSlogan","fWilaya"].forEach(id=>$(id).value="");selRoles.clear();
+  $("fCountry").value="DZ";syncCountry();data.gender=-1;setOrgLogo(null,"");build();$("e1").textContent=t("msgCleared")};
 $("langs").onclick=e=>{const b=e.target.closest("button");if(!b)return;lang=b.dataset.l;try{localStorage.setItem("diwan_lang",lang)}catch(x){}applyLang()};
 $("fCountry").onchange=()=>{syncCountry();draw()};
 $("fGender").onchange=()=>{data.gender=$("fGender").value===""?-1:+$("fGender").value;build();draw()};
@@ -348,8 +463,11 @@ $("to2").onclick=()=>{
   if(!$("fConsent").checked){$("e1").textContent=t("errConsent");return}
   $("e1").textContent="";
   const num=v=>v===""?-1:+v;
+  data.event=$("fEvent").value.trim();
   Object.assign(data,{name:n,country:$("fCountry").value||"DZ",wil:($("fCountry").value||"DZ")==="DZ"?num($("fWilaya").value):-1,age:num($("fAge").value),gender:num($("fGender").value),work:$("fWork").value.trim(),
     slogan:num($("fSlogan").value),custom:$("fCustom").value.trim(),otherRole:$("fOther").value.trim(),roles:[...selRoles].sort()});
+  saveProfile();
+  if(isTeam())Object.assign(data,{gender:-1,age:-1,roles:[],work:"",otherRole:""});
   if(!manualTpl&&data.roles.length)tpl=ROLES[data.roles[0]].tpl;   // قالب مقترح حسب الصفة
   build();go(2);draw();renderThumbs();
 };
@@ -533,7 +651,51 @@ zellij(){ctx.fillStyle=gl([[0,"#042f3a"],[.5,"#08596b"],[1,"#042f3a"]],0,0,0,H);
 med(){ctx.fillStyle=gl([[0,"#0a3a8c"],[.5,"#1491d4"],[1,"#27d3c3"]],0,0,0,H);ctx.fillRect(0,0,W,H);
   glow(300,200,640,"#7fe3ff",.55);rays(540,-60,28,"#ffffff",.12);bokeh(6,18,["#ffffff","#bff3ff"],14,46,.2);
   wave(1030,22,420,rgba("#33d6d0",.55),0);wave(1080,26,360,rgba("#1aa6d8",.8),1.4);wave(1140,26,400,rgba("#0e78c0",.92),2.6);wave(1200,24,340,rgba("#0a4f9c",.97),3.8);wave(1262,22,380,"#073577",5);
-  [[100,330,20],[990,420,24],[80,860,16]].forEach(p=>sparkle(p[0],p[1],p[2],"#ffffff",.95));vignette(.28);grain(.06)}
+  [[100,330,20],[990,420,24],[80,860,16]].forEach(p=>sparkle(p[0],p[1],p[2],"#ffffff",.95));vignette(.28);grain(.06)},
+jul5(){ctx.fillStyle=gl([[0,"#03361a"],[.55,"#0a6b34"],[1,"#052b17"]],0,0,0,H);ctx.fillRect(0,0,W,H);
+  glow(540,420,760,"#2fbf71",.4);
+  ctx.save();ctx.fillStyle="rgba(255,255,255,.07)";ctx.beginPath();ctx.moveTo(0,880);ctx.lineTo(W,420);ctx.lineTo(W,560);ctx.lineTo(0,1040);ctx.closePath();ctx.fill();ctx.restore();
+  crescent(AR?830:250,700,430,rgba("#d21034",.22));
+  const r=mulberry(5),cols=["#ffffff","#ffd23f","#ff5a5a","#7dffb2"];
+  [[120,360,70],[960,330,84],[90,820,60],[990,880,70],[540,150,56],[130,1120,50],[960,1130,56]].forEach((b,i)=>{
+    ctx.save();ctx.strokeStyle=rgba(cols[i%4],.8);ctx.fillStyle=rgba(cols[i%4],.9);ctx.lineWidth=3;ctx.lineCap="round";
+    for(let k=0;k<16;k++){const a=k*Math.PI/8,r0=b[2]*.35,r1=b[2]*(.8+(k%2)*.25);ctx.beginPath();ctx.moveTo(b[0]+Math.cos(a)*r0,b[1]+Math.sin(a)*r0);ctx.lineTo(b[0]+Math.cos(a)*r1,b[1]+Math.sin(a)*r1);ctx.stroke();ctx.beginPath();ctx.arc(b[0]+Math.cos(a)*r1*1.08,b[1]+Math.sin(a)*r1*1.08,3.2,0,7);ctx.fill()}
+    ctx.restore()});
+  confetti(r,["#ffffff","#d21034","#ffd23f"],70);stars(8,60,0,H,"#ffffff");vignette(.32);grain(.06)},
+ramadan(){ctx.fillStyle=gl([[0,"#0b1240"],[.55,"#2a1470"],[1,"#12082e"]],0,0,0,H);ctx.fillRect(0,0,W,H);
+  glow(AR?840:240,430,640,"#ffd37a",.32);glow(540,1200,700,"#8b5cf6",.35);
+  crescent(AR?860:220,440,210,rgba("#ffe9b0",.9));stars(21,110,0,H,"#ffffff");
+  islamic("#e6b93c",.12,150,2);
+  const lan=(x,len,col)=>{ctx.save();ctx.strokeStyle="rgba(255,226,150,.85)";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x,236);ctx.lineTo(x,236+len);ctx.stroke();
+    const y=236+len;glow(x,y+50,110,col,.6);ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(x-12,y);ctx.lineTo(x+12,y);ctx.lineTo(x+34,y+30);ctx.lineTo(x+22,y+96);ctx.lineTo(x-22,y+96);ctx.lineTo(x-34,y+30);ctx.closePath();ctx.fill();
+    ctx.fillStyle="rgba(255,255,255,.55)";ctx.beginPath();ctx.ellipse(x,y+56,9,22,0,0,7);ctx.fill();ctx.fillStyle=col;ctx.fillRect(x-26,y+96,52,10);ctx.restore()};
+  lan(54,80,"#ffb347");lan(1026,150,"#ff7a8a");lan(54,420,"#7fe3ff");lan(1026,520,"#ffd37a");
+  [[100,330,18],[985,780,22]].forEach(q=>sparkle(q[0],q[1],q[2],"#ffffff",.9));vignette(.3);grain(.06)},
+clean(){ctx.fillStyle=gl([[0,"#ffffff"],[1,"#e8eef8"]],0,0,0,H);ctx.fillRect(0,0,W,H);
+  glow(0,0,620,"#1c7ed6",.22);glow(W,H,720,"#10a88a",.24);glow(W,200,420,"#e6b93c",.16);
+  ctx.save();ctx.strokeStyle="rgba(15,61,110,.07)";ctx.lineWidth=2;for(let i=0;i<14;i++){ctx.beginPath();ctx.arc(W+40,-20,200+i*70,0,7);ctx.stroke()}ctx.restore();
+  ctx.save();ctx.fillStyle="rgba(15,61,110,.05)";for(let y=300;y<1300;y+=48)for(let x=(y/48%2)*24+20;x<W;x+=48){ctx.beginPath();ctx.arc(x,y,2.2,0,7);ctx.fill()}ctx.restore();grain(.03)},
+tech(){ctx.fillStyle=gl([[0,"#030816"],[.6,"#071a33"],[1,"#04101f"]],0,0,0,H);ctx.fillRect(0,0,W,H);
+  glow(180,300,700,"#00e5ff",.3);glow(940,900,760,"#22ff9a",.26);glow(540,1300,520,"#3b82f6",.3);
+  ctx.save();ctx.strokeStyle="rgba(0,229,255,.07)";ctx.lineWidth=1.5;for(let x=0;x<=W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<=H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}ctx.restore();
+  const r=mulberry(14);ctx.save();ctx.lineWidth=3;ctx.lineJoin="round";
+  for(let i=0;i<20;i++){let x=Math.round(r()*18)*60,y=Math.round(r()*22)*60;const c=i%2?"#00e5ff":"#22ff9a";ctx.strokeStyle=rgba(c,.5);ctx.fillStyle=rgba(c,.9);ctx.beginPath();ctx.moveTo(x,y);
+    for(let k=0;k<4;k++){if(k%2)y+=(r()<.5?-1:1)*60*(1+Math.floor(r()*2));else x+=(r()<.5?-1:1)*60*(1+Math.floor(r()*2));ctx.lineTo(x,y)}ctx.stroke();ctx.beginPath();ctx.arc(x,y,7,0,7);ctx.fill()}ctx.restore();
+  stars(3,50,0,H,"#7fe3ff");vignette(.35);grain(.05)},
+track(){ctx.fillStyle=gl([[0,"#b83a14"],[.5,"#e0561f"],[1,"#8c2a0c"]],0,0,0,H);ctx.fillRect(0,0,W,H);
+  glow(900,200,700,"#ffb347",.4);
+  ctx.save();for(let i=0;i<9;i++){ctx.strokeStyle=i%2?"rgba(255,255,255,.55)":"rgba(255,255,255,.9)";ctx.lineWidth=i%2?3:5;ctx.beginPath();ctx.ellipse(AR?-200:1280,1500,900-i*0+i*0+(i*95),1300-i*20+i*95-i*95,0,Math.PI,Math.PI*1.5);ctx.stroke()}ctx.restore();
+  ctx.save();ctx.strokeStyle="rgba(255,255,255,.14)";ctx.lineWidth=4;for(let i=0;i<7;i++){ctx.beginPath();ctx.moveTo(-50,260+i*120);ctx.lineTo(W+50,140+i*120);ctx.stroke()}ctx.restore();
+  ctx.fillStyle="rgba(20,6,0,.45)";ctx.fillRect(0,1000,W,350);glow(540,1200,600,"#000000",.25);
+  [[100,330,20],[985,520,24]].forEach(q=>sparkle(q[0],q[1],q[2],"#ffffff",.9));vignette(.38);grain(.07)},
+eco(){ctx.fillStyle=gl([[0,"#0b6b3a"],[.5,"#119a54"],[1,"#065028"]],0,0,0,H);ctx.fillRect(0,0,W,H);
+  glow(300,260,700,"#b6f5c4",.38);glow(900,1100,720,"#e6ff8a",.22);
+  const leaf=(x,y,len,ang,col,al)=>{ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.fillStyle=rgba(col,al);ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(len*.5,-len*.34,len,0);ctx.quadraticCurveTo(len*.5,len*.34,0,0);ctx.fill();
+    ctx.strokeStyle=rgba("#ffffff",al*.5);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(len*.92,0);ctx.stroke();ctx.restore()};
+  const r=mulberry(31);
+  for(let i=0;i<26;i++){const side=i%2?1:0,x=side?W-r()*130:r()*130,y=260+r()*900;leaf(x,y,90+r()*130,(side?Math.PI:0)+(r()-.5)*1.5,["#b6f5c4","#7ddc9a","#e6ff8a","#38b56a"][i%4],.35+r()*.4)}
+  for(let i=0;i<10;i++)leaf(40+i*110,1330,120+r()*60,-Math.PI/2+(r()-.5)*.7,["#38b56a","#7ddc9a"][i%2],.5);
+  bokeh(12,16,["#e6ff8a","#ffffff"],14,50,.18);vignette(.3);grain(.05)}
 };
 
 const BOX={x:140,y:272,w:800,h:800,r:48};
@@ -569,6 +731,65 @@ function header(T){
   ctx.strokeStyle=dg;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(80,236);ctx.lineTo(1000,236);ctx.stroke();ctx.fillStyle=dv;poly(540,236,10,4,0);ctx.fill();
 }
 
+const STK=[["flag",{ar:"علم الجزائر",fr:"Drapeau",en:"Flag"}],["medal",{ar:"ميدالية",fr:"Médaille",en:"Medal"}],["star",{ar:"نجمة",fr:"Étoile",en:"Star"}],["heart",{ar:"قلب",fr:"Cœur",en:"Heart"}],["crown",{ar:"تاج",fr:"Couronne",en:"Crown"}]];
+let stks=[],stkSel=-1,sdrag=null;
+function starP(x,y,R,r){ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,q=i%2?r:R;ctx[i?"lineTo":"moveTo"](x+Math.cos(a)*q,y+Math.sin(a)*q)}ctx.closePath()}
+function drawStk(k){
+  if(k==="flag"){ctx.save();ctx.beginPath();ctx.roundRect(-75,-50,150,100,10);ctx.clip();ctx.fillStyle="#0b6a32";ctx.fillRect(-75,-50,75,100);ctx.fillStyle="#ffffff";ctx.fillRect(0,-50,75,100);
+    ctx.fillStyle="#d21034";ctx.beginPath();ctx.arc(2,0,26,0,7);ctx.fill();ctx.fillStyle="#ffffff";ctx.beginPath();ctx.arc(10,0,21,0,7);ctx.fill();
+    ctx.fillStyle="#d21034";starP(14,0,17,7);ctx.fill();ctx.restore();ctx.lineWidth=4;ctx.strokeStyle="#ffffff";ctx.beginPath();ctx.roundRect(-75,-50,150,100,10);ctx.stroke()}
+  else if(k==="medal"){ctx.fillStyle="#d21034";ctx.beginPath();ctx.moveTo(-34,-70);ctx.lineTo(-4,-70);ctx.lineTo(18,10);ctx.lineTo(-12,10);ctx.fill();ctx.fillStyle="#0f3d6e";ctx.beginPath();ctx.moveTo(34,-70);ctx.lineTo(4,-70);ctx.lineTo(-18,10);ctx.lineTo(12,10);ctx.fill();
+    ctx.fillStyle=goldG(-48,-10,48,86);ctx.beginPath();ctx.arc(0,36,48,0,7);ctx.fill();ctx.lineWidth=5;ctx.strokeStyle="#fff3b0";ctx.stroke();ctx.fillStyle="#a77616";starP(0,36,28,12);ctx.fill()}
+  else if(k==="star"){ctx.fillStyle=goldG(-60,-60,60,60);ctx.lineJoin="round";ctx.lineWidth=7;ctx.strokeStyle="#ffffff";starP(0,4,62,26);ctx.stroke();ctx.fill()}
+  else if(k==="heart"){heart(0,0,58,"#ff3b6b");ctx.lineWidth=5;ctx.strokeStyle="#ffffff";ctx.stroke()}
+  else if(k==="crown"){ctx.fillStyle=goldG(-70,-50,70,50);ctx.lineJoin="round";ctx.lineWidth=5;ctx.strokeStyle="#fff3b0";ctx.beginPath();ctx.moveTo(-66,44);ctx.lineTo(-76,-40);ctx.lineTo(-36,-8);ctx.lineTo(0,-56);ctx.lineTo(36,-8);ctx.lineTo(76,-40);ctx.lineTo(66,44);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle="#d21034";[[-36,22],[0,22],[36,22]].forEach(q=>{ctx.beginPath();ctx.arc(q[0],q[1],9,0,7);ctx.fill()})}
+}
+function drawStickers(){
+  stks.forEach((o,i)=>{ctx.save();sh("rgba(0,0,0,.4)",16,6);ctx.translate(o.x,o.y);ctx.scale(o.s,o.s);drawStk(o.k);ctx.restore();
+    if(i===stkSel&&ctx===mainCtx){ctx.save();ctx.setLineDash([10,8]);ctx.lineWidth=3;ctx.strokeStyle="rgba(255,255,255,.95)";ctx.beginPath();ctx.arc(o.x,o.y,86*o.s,0,7);ctx.stroke();ctx.restore()}})}
+function stkUI(){
+  $("stkChips").innerHTML=STK.map(([k,n])=>`<span class="chip" data-k="${k}">${n[lang]}</span>`).join("");
+  $("stkCtl").classList.toggle("hidden",stkSel<0||!stks[stkSel]);
+}
+function stkHit(e){
+  const r=cv.getBoundingClientRect(),k=cv.width/r.width,x=(e.clientX-r.left)*k,y=(e.clientY-r.top)*k;
+  for(let i=stks.length-1;i>=0;i--){const o=stks[i];if(Math.hypot(x-o.x,y-o.y)<=80*o.s+10)return i}return -1}
+$("stkChips").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;if(stks.length>=4)stks.shift();
+  stks.push({k:c.dataset.k,x:BOX.x+BOX.w-110,y:BOX.y+BOX.h-110,s:1});stkSel=stks.length-1;stkUI();draw();renderThumbs()};
+$("stkBig").onclick=()=>{const o=stks[stkSel];if(o){o.s=Math.min(2.6,o.s*1.15);draw();renderThumbs()}};
+$("stkSmall").onclick=()=>{const o=stks[stkSel];if(o){o.s=Math.max(.4,o.s/1.15);draw();renderThumbs()}};
+$("stkDel").onclick=()=>{if(stkSel>=0){stks.splice(stkSel,1);stkSel=-1;stkUI();draw();renderThumbs()}};
+let enhOn=false;
+function enhDraw(fn){
+  if(!enhOn){fn();return}
+  if("filter" in CanvasRenderingContext2D.prototype){ctx.save();ctx.filter="brightness(1.2) contrast(1.12) saturate(1.15)";fn();ctx.restore();return}
+  fn();
+  ctx.save();ctx.globalCompositeOperation="screen";ctx.globalAlpha=.38;fn();
+  ctx.globalCompositeOperation="soft-light";ctx.globalAlpha=.7;fn();ctx.restore()}
+function bgBlur(im){if(!im._b){const c=document.createElement("canvas"),q=24;c.width=q;c.height=Math.max(1,Math.round(q*im.height/im.width));c.getContext("2d").drawImage(im,0,0,c.width,c.height);im._b=c}return im._b}
+function coverBlur(im,x,y,w,h,dark){const bb=bgBlur(im),k=Math.max(w/bb.width,h/bb.height),bw=bb.width*k,bh=bb.height*k;
+  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.imageSmoothingEnabled=true;ctx.drawImage(bb,x+(w-bw)/2,y+(h-bh)/2,bw,bh);ctx.fillStyle="rgba(0,0,0,"+dark+")";ctx.fillRect(x,y,w,h);ctx.restore()}
+function collage(PB,shape){
+  coverBlur(timgs[0],PB.x,PB.y,PB.w,PB.h,.45);
+  const L=shape==="circle"?[BOX.x+117,BOX.y+100,566,566]:shape==="hex"?[BOX.x+150,BOX.y+90,500,640]:(shape==="arch"||shape==="horse")?[BOX.x+60,BOX.y+190,680,540]:[BOX.x+20,BOX.y+20,760,710];
+  const n=timgs.length,g=10,[x,y,w,h]=L,hw=(w-g)/2,hh=(h-g)/2;
+  const R=n===1?[[x,y,w,h]]:n===2?[[x,y,hw,h],[x+hw+g,y,hw,h]]:n===3?[[x,y,hw,h],[x+hw+g,y,hw,hh],[x+hw+g,y+hh+g,hw,hh]]:[[x,y,hw,hh],[x+hw+g,y,hw,hh],[x,y+hh+g,hw,hh],[x+hw+g,y+hh+g,hw,hh]];
+  R.forEach((r,i)=>{const im=timgs[i];
+    ctx.save();ctx.beginPath();ctx.roundRect(r[0],r[1],r[2],r[3],16);ctx.clip();
+    coverBlur(im,r[0],r[1],r[2],r[3],.2);
+    const rq=im._r||0,sw=rq%2,w0=sw?im.height:im.width,h0=sw?im.width:im.height,k=Math.min(r[2]/w0,r[3]/h0)*(im._z||1);
+    ctx.translate(r[0]+r[2]/2+(im._ox||0),r[1]+r[3]/2+(im._oy||0));ctx.rotate(rq*Math.PI/2);ctx.drawImage(im,-im.width*k/2,-im.height*k/2,im.width*k,im.height*k);ctx.restore();
+    ctx.save();const on=(n>1&&i===tsel&&ctx===mainCtx);ctx.lineWidth=on?6:3;ctx.strokeStyle=on?"#ffd23f":"rgba(255,255,255,.9)";ctx.beginPath();ctx.roundRect(r[0],r[1],r[2],r[3],16);ctx.stroke();ctx.restore()});
+  if(ctx===mainCtx)cellRects=R;
+}
+function eventRibbon(T){
+  if(!data.event)return;
+  const sz=fit(data.event,640,30,700,20),tw=ctx.measureText(data.event).width,w=Math.min(720,tw+96),h=50,x=(W-w)/2,y=250;
+  ctx.save();sh("rgba(0,0,0,.35)",18,6);ctx.fillStyle=fillOf(T.pill.fill,x,y,x+w,y+h);rr(x,y,w,h,h/2);ctx.fill();ctx.restore();
+  ctx.save();ctx.lineWidth=3;ctx.strokeStyle="rgba(255,255,255,.92)";rr(x,y,w,h,h/2);ctx.stroke();ctx.restore();
+  ctx.fillStyle=T.pill.tx;ctx.textAlign="center";ctx.fillText(data.event,W/2,y+h/2+sz*.34,w-56);
+}
 function frame(T){
   const cx=BOX.x+BOX.w/2,cy=BOX.y+BOX.h/2;
   if(T.laurel){const g=goldG(0,900,W,1100);laurel(96,1075,470,-1.28,false,g);laurel(984,1075,470,-1.28,true,g)}
@@ -576,12 +797,14 @@ function frame(T){
   ctx.save();shapePath(T.shape);sh("rgba(0,0,0,.42)",56,24);ctx.fillStyle="#1b2a4a";ctx.fill();ctx.restore();
   if(T.glow){ctx.save();shapePath(T.shape);ctx.shadowColor=rgba(T.glow,.95);ctx.shadowBlur=70*SC;ctx.lineWidth=30;ctx.strokeStyle=T.glow;ctx.stroke();ctx.restore()}
   ctx.save();shapePath(T.shape);ctx.clip();
-  if(img){
+  if(isTeam()&&timgs.length){
+    enhDraw(()=>collage(T.shape==="horse"?{x:BOX.x-26,y:BOX.y,w:BOX.w+52,h:BOX.h}:BOX,T.shape));
+  }else if(img&&!isTeam()){
     const PB=T.shape==="horse"?{x:BOX.x-26,y:BOX.y,w:BOX.w+52,h:BOX.h}:BOX;
     const odd=rot%2===1,iw=odd?img.height:img.width,ih=odd?img.width:img.height;
     const base=Math.max(PB.w/iw,PB.h/ih),s=base*zoom,w=iw*s,h=ih*s;
     const mx=(w-PB.w)/2,my=(h-PB.h)/2;ox=Math.max(-mx,Math.min(mx,ox));oy=Math.max(-my,Math.min(my,oy));
-    ctx.save();ctx.translate(PB.x+PB.w/2+ox,PB.y+PB.h/2+oy);ctx.rotate(rot*Math.PI/2);ctx.drawImage(img,-img.width*s/2,-img.height*s/2,img.width*s,img.height*s);ctx.restore();
+    enhDraw(()=>{ctx.save();ctx.translate(PB.x+PB.w/2+ox,PB.y+PB.h/2+oy);ctx.rotate(rot*Math.PI/2);ctx.drawImage(img,-img.width*s/2,-img.height*s/2,img.width*s,img.height*s);ctx.restore()});
   }else{
     ctx.fillStyle=lin(["#3a4c86","#17213f"],0,BOX.y,0,BOX.y+BOX.h);ctx.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);
     ctx.fillStyle="rgba(255,255,255,.17)";ctx.beginPath();ctx.arc(cx,cy-100,140,0,7);ctx.fill();ctx.beginPath();ctx.ellipse(cx,cy+330,320,260,0,0,7);ctx.fill();
@@ -595,6 +818,13 @@ function frame(T){
   ctx.save();sh("rgba(0,0,0,.35)",18,6);ctx.fillStyle="#ffffff";ctx.beginPath();ctx.arc(bx,by,58,0,7);ctx.fill();ctx.restore();
   ctx.fillStyle=T.badge;ctx.beginPath();ctx.arc(bx,by,48,0,7);ctx.fill();
   ctx.strokeStyle="#ffffff";ctx.lineWidth=11;ctx.lineCap="round";ctx.lineJoin="round";ctx.beginPath();ctx.moveTo(bx-20,by+1);ctx.lineTo(bx-6,by+16);ctx.lineTo(bx+22,by-15);ctx.stroke();
+  if(orgLogo){
+    const lx2=T.shape==="hex"?cx-200:(T.shape==="circle"||T.shape==="arch"||T.shape==="horse")?2*cx-bx:BOX.x+26,ly2=by;
+    ctx.save();sh("rgba(0,0,0,.35)",18,6);ctx.fillStyle="#ffffff";ctx.beginPath();ctx.arc(lx2,ly2,58,0,7);ctx.fill();ctx.restore();
+    const k=Math.min(84/orgLogo.width,84/orgLogo.height),w=orgLogo.width*k,h=orgLogo.height*k;
+    ctx.save();ctx.beginPath();ctx.arc(lx2,ly2,52,0,7);ctx.clip();ctx.drawImage(orgLogo,lx2-w/2,ly2-h/2,w,h);ctx.restore();
+    ctx.lineWidth=4;ctx.strokeStyle=goldG(lx2-58,ly2-58,lx2+58,ly2+58);ctx.beginPath();ctx.arc(lx2,ly2,58,0,7);ctx.stroke();
+  }
 }
 
 function plate(T){
@@ -629,7 +859,7 @@ function texts(T){
   let y=1174;if(data.work){ctx.fillText(data.work,W/2,y,940);y+=46}
   lineFlag(l2,y);
   const fem=data.gender===1,tg=tagFor(T,fem);
-  const ptxt=data.custom||(data.slogan>=0?sloganTxt(SLOGANS[data.slogan]):(tg||t("pill")));
+  const ptxt=data.custom||(data.slogan>=0?sloganTxt(SLOGANS[data.slogan]):(isTeam()?t("pillTeam"):(tg||t("pill"))));
   ctx.font="700 32px Cairo,Tahoma,sans-serif";
   const pw=Math.min(980,ctx.measureText(ptxt).width+110),py=1256;
   ctx.save();sh("rgba(0,0,0,.3)",20,8);ctx.fillStyle=fillOf(T.pill.fill,W/2-pw/2,py,W/2+pw/2,py+60);rr(W/2-pw/2,py,pw,60,30);ctx.fill();ctx.restore();
@@ -640,7 +870,7 @@ function texts(T){
 function scene(c,ti,sc){
   const prev=ctx;ctx=c;SC=sc;AR=lang==="ar";const T=TPLS[ti];
   ctx.save();ctx.direction=AR?"rtl":"ltr";
-  BG[T.bg]();header(T);frame(T);plate(T);texts(T);
+  BG[T.bg]();header(T);frame(T);eventRibbon(T);plate(T);texts(T);drawStickers();
   ctx.restore();ctx=prev;SC=1;
 }
 function draw(){mainCtx.setTransform(1,0,0,1,0,0);scene(mainCtx,tpl,1)}
@@ -649,33 +879,45 @@ function renderThumbs(){document.querySelectorAll("#tpls canvas").forEach((c,i)=
 document.fonts.load("800 40px Cairo").then(()=>document.fonts.ready).then(()=>{draw();renderThumbs()}).catch(()=>{});
 
 $("pick").onclick=()=>$("file").click();
-cv.onclick=()=>{if(!img)$("file").click()};
+cv.onclick=()=>{if(isTeam()){if(timgs.length<4)$("teamFile").click()}else if(!img)$("file").click()};
 $("file").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   const u=URL.createObjectURL(f),i=new Image();
   i.onload=()=>{img=i;zoom=1;rot=0;ox=oy=0;$("zoom").value=1;$("e2").textContent="";$("pick").textContent=t("pick2");draw();renderThumbs()};
   i.src=u;
 };
-$("rotBtn").onclick=()=>{if(!img)return;rot=(rot+1)%4;ox=oy=0;draw();renderThumbs()};
-$("zoom").oninput=e=>{zoom=+e.target.value;draw()};
+$("rotBtn").onclick=()=>{if(isTeam()){const m=timgs[tsel];if(!m)return;m._r=((m._r||0)+1)%4;m._ox=m._oy=0;draw();renderThumbs();return}if(!img)return;rot=(rot+1)%4;ox=oy=0;draw();renderThumbs()};
+$("enh").onchange=e=>{enhOn=e.target.checked;draw();renderThumbs()};
+$("zoom").oninput=e=>{if(isTeam()){const m=timgs[tsel];if(m){m._z=+e.target.value;draw()}return}zoom=+e.target.value;draw()};
 let drag=null,pinch=null;const ptrs=new Map();
 const kk=()=>cv.width/cv.getBoundingClientRect().width;
-const setZoom=z=>{zoom=Math.max(1,Math.min(3,z));$("zoom").value=zoom;draw()};
-cv.addEventListener("pointerdown",e=>{if(!img)return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});cv.setPointerCapture(e.pointerId);
-  if(ptrs.size===1){drag={x:e.clientX,y:e.clientY,ox,oy};cv.style.cursor="grabbing"}
-  else if(ptrs.size===2){const [p,q]=[...ptrs.values()];pinch={d:Math.hypot(p.x-q.x,p.y-q.y)||1,z:zoom};drag=null}});
-cv.addEventListener("pointermove",e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+const hasT=()=>isTeam()?!!timgs[tsel]:!!img;
+const getZ=()=>isTeam()?((timgs[tsel]&&timgs[tsel]._z)||1):zoom;
+const getO=()=>isTeam()?[(timgs[tsel]&&timgs[tsel]._ox)||0,(timgs[tsel]&&timgs[tsel]._oy)||0]:[ox,oy];
+const setO=(a,b)=>{if(isTeam()){const m=timgs[tsel],r=cellRects[tsel];if(!m)return;const lx=r?r[2]/2:300,ly=r?r[3]/2:300;m._ox=Math.max(-lx,Math.min(lx,a));m._oy=Math.max(-ly,Math.min(ly,b))}else{ox=a;oy=b}};
+const setZoom=z=>{z=Math.max(1,Math.min(3,z));if(isTeam()){const m=timgs[tsel];if(m)m._z=z}else zoom=z;$("zoom").value=z;draw()};
+cv.addEventListener("pointerdown",e=>{
+  const hi=stkHit(e);if(hi>=0){stkSel=hi;sdrag={i:hi,x:e.clientX,y:e.clientY,sx:stks[hi].x,sy:stks[hi].y};cv.setPointerCapture(e.pointerId);stkUI();draw();return}
+  if(isTeam()&&timgs.length>1&&ptrs.size===0){const r=cv.getBoundingClientRect(),k=cv.width/r.width,x=(e.clientX-r.left)*k,y=(e.clientY-r.top)*k;
+    const c=cellRects.findIndex(q=>x>=q[0]&&x<=q[0]+q[2]&&y>=q[1]&&y<=q[1]+q[3]);if(c>=0&&c!==tsel){tsel=c;$("zoom").value=getZ();drawTeamThumbs();draw()}}
+  if(!hasT())return;
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});cv.setPointerCapture(e.pointerId);
+  if(ptrs.size===1){const [a,b]=getO();drag={x:e.clientX,y:e.clientY,ox:a,oy:b};cv.style.cursor="grabbing"}
+  else if(ptrs.size===2){const [p,q]=[...ptrs.values()];pinch={d:Math.hypot(p.x-q.x,p.y-q.y)||1,z:getZ()};drag=null}});
+cv.addEventListener("pointermove",e=>{
+  if(sdrag){const o=stks[sdrag.i],k=kk();o.x=Math.max(30,Math.min(1050,sdrag.sx+(e.clientX-sdrag.x)*k));o.y=Math.max(150,Math.min(1300,sdrag.sy+(e.clientY-sdrag.y)*k));draw();return}
+  if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(ptrs.size===2&&pinch){const [p,q]=[...ptrs.values()];setZoom(pinch.z*Math.hypot(p.x-q.x,p.y-q.y)/pinch.d)}
-  else if(drag&&ptrs.size===1){ox=drag.ox+(e.clientX-drag.x)*kk();oy=drag.oy+(e.clientY-drag.y)*kk();draw()}});
-const endPtr=e=>{ptrs.delete(e.pointerId);pinch=null;drag=null;if(ptrs.size===1){const [p]=[...ptrs.values()];drag={x:p.x,y:p.y,ox,oy}}cv.style.cursor="grab"};
+  else if(drag&&ptrs.size===1){setO(drag.ox+(e.clientX-drag.x)*kk(),drag.oy+(e.clientY-drag.y)*kk());draw()}});
+const endPtr=e=>{if(sdrag){sdrag=null;renderThumbs();return}ptrs.delete(e.pointerId);pinch=null;drag=null;if(ptrs.size===1){const [p]=[...ptrs.values()],[a,b]=getO();drag={x:p.x,y:p.y,ox:a,oy:b}}cv.style.cursor="grab";renderThumbs()};
 ["pointerup","pointercancel"].forEach(ev=>cv.addEventListener(ev,endPtr));
-cv.addEventListener("wheel",e=>{if(!img)return;e.preventDefault();setZoom(zoom*(e.deltaY<0?1.06:.94))},{passive:false});
+cv.addEventListener("wheel",e=>{if(!hasT())return;e.preventDefault();setZoom(getZ()*(e.deltaY<0?1.06:.94))},{passive:false});
 $("back1").onclick=()=>go(1);
 
 /* الخطوة 3 */
 let blob=null;
 let capV=0,capEdited=false;
-const caption=()=>{
+const captionBase=()=>{
   const dz=data.country==="DZ",w=dz&&data.wil>=0?wname(data.wil):"",cn=cname(data.country),H=CONFIG.HASHTAGS.join(" "),fm=data.gender===1,v=capV%3;
   if(lang==="ar"){const loc=dz?(w?" من ولاية "+w:""):" من "+cn,hp=fm?"سعيدة":"سعيد";
     return [`أنا ${data.name}${loc} أشارك صورتي مع مجتمع ${CONFIG.ORG_AR}.\n${hp} بوجودي بينكم!\n${H}`,
@@ -689,6 +931,27 @@ const caption=()=>{
   return [`I'm ${data.name}${loc} and I'm sharing my photo with the ${CONFIG.ORG_EN} community.\nHappy to be among you!\n${H}`,
     `${data.name}${loc}\nHappy to be among you! Sharing my photo with the ${CONFIG.ORG_EN} community. Join us!\n${H}`,
     `Proud to be part of the ${CONFIG.ORG_EN} community ✨\n${data.name}${loc}\n${H}`][v];
+};
+const teamCap=()=>{
+  const dz=data.country==="DZ",w=dz&&data.wil>=0?wname(data.wil):"",cn=cname(data.country),H=CONFIG.HASHTAGS.join(" "),v=capV%3;
+  if(lang==="ar"){const loc=dz?(w?" من ولاية "+w:""):" من "+cn;
+    return [`نحن ${data.name}${loc} نشارك صورتنا مع مجتمع ${CONFIG.ORG_AR}.\nسعداء بوجودنا بينكم!\n${H}`,
+      `${data.name}${loc}\nسعداء بوجودنا بينكم! نشارك صورتنا مع مجتمع ${CONFIG.ORG_AR} وندعوكم إلى المشاركة.\n${H}`,
+      `نفتخر بالانتماء إلى مجتمع ${CONFIG.ORG_AR} ✨\nنحن ${data.name}${loc}.\n${H}`][v]}
+  if(lang==="fr"){const loc=dz?(w?" de la wilaya de "+w:""):" ("+cn+")";
+    return [`Nous sommes ${data.name}${loc} et nous partageons notre photo avec la communauté du ${CONFIG.ORG_FR}.\nHeureux d'être parmi vous !\n${H}`,
+      `${data.name}${loc}\nHeureux d'être parmi vous ! Rejoignez-nous dans la communauté du ${CONFIG.ORG_FR}.\n${H}`,
+      `Fiers d'appartenir à la communauté du ${CONFIG.ORG_FR} ✨\n${data.name}${loc}\n${H}`][v]}
+  const loc=dz?(w?" from "+w+" Wilaya":""):" from "+cn;
+  return [`We are ${data.name}${loc} and we're sharing our photo with the ${CONFIG.ORG_EN} community.\nHappy to be among you!\n${H}`,
+    `${data.name}${loc}\nHappy to be among you! Join us in the ${CONFIG.ORG_EN} community.\n${H}`,
+    `Proud to be part of the ${CONFIG.ORG_EN} community ✨\n${data.name}${loc}\n${H}`][v];
+};
+const caption=()=>{
+  let c=isTeam()?teamCap():captionBase();
+  if(data.event){const ev=(lang==="ar"?"📌 في فعالية: ":lang==="fr"?"📌 Lors de : ":"📌 At: ")+data.event,H=CONFIG.HASHTAGS.join(" "),i=c.lastIndexOf("\n"+H);
+    c=i>=0?c.slice(0,i)+"\n"+ev+c.slice(i):c+"\n"+ev}
+  return c;
 };
 const setCap=()=>{if(!capEdited)$("caption").value=caption()};
 const curCap=()=>$("caption").value.trim()||caption();
@@ -711,7 +974,7 @@ function buildFormats(){$("fmts").innerHTML=[["45","fmtPost"],["11","fmtSquare"]
 $("fmts").onclick=e=>{const c=e.target.closest(".chip");if(!c||!art)return;fmt=c.dataset.f;buildFormats();
   $("busy").classList.remove("hidden");setTimeout(()=>{try{composeFormat().toBlob(b=>{$("busy").classList.add("hidden");if(b)showBlob(b,false)},"image/jpeg",0.95)}catch(err){$("busy").classList.add("hidden");say(t("errMake"))}},50)};
 $("to3").onclick=()=>{
-  if(!img){$("e2").textContent=t("errPhoto");return}
+  if(isTeam()){if(timgs.length<1){$("e2").textContent=t("errTeam");return}}else if(!img){$("e2").textContent=t("errPhoto");return}
   $("e2").textContent="";$("busy").classList.remove("hidden");
   setTimeout(()=>{
     const fail=err=>{if(err)console.error(err);$("busy").classList.add("hidden");$("e2").textContent=t("errMake")+(err&&err.name?" ("+err.name+")":"")};
@@ -730,6 +993,12 @@ function say(m){const e=$("msg");e.textContent=m;e.classList.remove("hidden")}
 function download(){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="diwan-"+Date.now()+".jpg";a.click()}
 $("dl").onclick=()=>{download();say(t("msgDl"))};
 $("copy").onclick=async()=>{try{await navigator.clipboard.writeText(curCap());say(t("msgCopy"))}catch(e){say(t("msgCopyFail"))}};
+const canCopyImg=!!(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write);
+if(canCopyImg)$("copyImg").classList.remove("hidden");
+$("copyImg").onclick=async()=>{
+  try{const c=composeFormat()||cv;const pr=new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error("png")),"image/png"));
+    await navigator.clipboard.write([new ClipboardItem({"image/png":pr})]);say(t("msgImgCopy"))}
+  catch(e){download();say(t("msgImgCopyFail"))}};
 $("openGroup").onclick=()=>window.open(CONFIG.GROUP_URL,"_blank");
 $("share").onclick=async()=>{
   const file=new File([blob],"diwan.jpg",{type:"image/jpeg"});
@@ -740,8 +1009,17 @@ $("share").onclick=async()=>{
   download();window.open(CONFIG.GROUP_URL,"_blank");say(t("msgFb"));
 };
 $("back2").onclick=()=>go(2);
+$("newBtn").onclick=()=>{
+  img=null;zoom=1;rot=0;ox=oy=0;$("zoom").value=1;timgs.length=0;tsel=0;$("file").value="";$("teamFile").value="";enhOn=false;$("enh").checked=false;stks=[];stkSel=-1;blob=null;art=null;fmt="45";capV=0;capEdited=false;manualTpl=false;
+  $("msg").classList.add("hidden");$("e1").textContent="";$("e2").textContent="";$("fConsent").checked=false;
+  applyLang();go(1);
+};
 
 applyLang();
+try{if(!localStorage.getItem("diwan_seen"))$("hint").classList.remove("hidden")}catch(e){$("hint").classList.remove("hidden")}
+$("hintOk").onclick=()=>{$("hint").classList.add("hidden");try{localStorage.setItem("diwan_seen","1")}catch(e){}};
+loadProfile();
+try{const ev=new URLSearchParams(location.search).get("event");if(ev)$("fEvent").value=ev.slice(0,70)}catch(e){}
 </script>
 </body>
 </html>
