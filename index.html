@@ -126,12 +126,12 @@ aside h1{font-size:20px;margin:14px 0 10px}.steps{flex-direction:row}.step{flex:
   <label data-i="lStk"></label><div class="chips" id="stkChips"></div>
   <div class="row hidden" id="stkCtl"><button class="btn sec" id="stkBig" style="padding:10px">＋</button><button class="btn sec" id="stkSmall" style="padding:10px">－</button><button class="btn sec" id="stkDel" style="padding:10px">🗑</button></div>
   <p class="sub" style="margin:6px 0 0;font-size:12px" data-i="stkHint"></p>
-  <div id="txtCtl" class="hidden">
+  <div id="txtCtl">
     <label data-i="lTxt"></label>
     <label class="consent" style="margin:6px 0"><input type="checkbox" id="txtShow" checked><span data-i="txtShow"></span></label>
     <div class="chips" id="txtColors"></div>
     <div class="row" style="margin-top:8px"><button class="btn sec" id="txtUp" style="padding:10px">▲</button><button class="btn sec" id="txtDn" style="padding:10px">▼</button><button class="btn sec" id="txtBig" style="padding:10px">＋</button><button class="btn sec" id="txtSmall" style="padding:10px">－</button><button class="btn sec" id="txtRst" style="padding:10px" data-i="txtReset"></button></div>
-    <label class="consent" style="margin:8px 0 0"><input type="checkbox" id="txtGrad" checked><span data-i="txtGrad"></span></label>
+    <label class="consent" id="txtGradRow" style="margin:8px 0 0"><input type="checkbox" id="txtGrad" checked><span data-i="txtGrad"></span></label>
     <button type="button" class="linkbtn" id="txtEdit" data-i="txtEdit"></button>
     <p class="sub" style="margin:6px 0 0;font-size:12px" data-i="txtHint"></p>
   </div>
@@ -313,7 +313,7 @@ const TPL_ROLE={young:6,athlete:3,vol:8,pres:1,staff:0,coach:7};
 
 const L={
 ar:{org:CONFIG.ORG_AR,brandSub:"",h1:"شارك صورتك مع مجموعة الديوان",st1:"البيانات",st2:"صورتك",st3:"المشاركة",
- c1h:"بياناتك",c1sub:"معلومات بسيطة تظهر على صورتك. كل الحقول اختيارية عدا الاسم.",lName:"الاسم واللقب *",pName:"مثال: بن دوحة بوعلام",
+ c1h:"بياناتك",c1sub:"معلومات بسيطة تظهر على صورتك. كل الحقول اختيارية عدا الاسم.",lName:"الاسم واللقب *",pName:"مثال: محمد بن علي",
  lCountry:"الدولة",lWilaya:"الولاية",pickW:"اختر الولاية",lAge:"الفئة العمرية",lGender:"الجنس (اختياري)",pickAge:"اختر",lRole:"صفتك (اختياري)",
  lWork:"مكان العمل / المؤسسة / الجمعية (اختياري)",pWork:"مثال: جمعية الأمل الشبابية",pOther:"اكتب صفتك (مثال: صحفي، طالب، فنان)",lCustom:"أو اكتب كلمة / جملة قصيرة بنفسك (اختياري)",pCustom:"مثال: أحب وطني وأخدمه",lSlogan:"عبارة على الصورة (اختياري)",noSlogan:"بدون عبارة",
  consent:"أوافق على استعمال اسمي وصورتي لإنشاء الصورة ونشرها في مجموعة ديوان قطاع الشباب والرياضة.",next:"التالي ←",
@@ -322,7 +322,7 @@ ar:{org:CONFIG.ORG_AR,brandSub:"",h1:"شارك صورتك مع مجموعة ال
  c3h:"شكراً لك! 🎉",c3sub:"صورتك جاهزة للمشاركة في مجموعة الديوان.",back2:"تغيير الصورة",dl:"⬇ تحميل",share:"مشاركة",openGroup:"فتح مجموعة الديوان على فيسبوك",
  postHint:"انشر الصورة في المجموعة مع التعليق والوسوم:",copy:"نسخ التعليق والوسوم",
  lMode:"نوع المشاركة",modeSolo:"👤 صورة شخصية",modeTeam:"👥 صورة فريق / جمعية",lNameTeam:"اسم الفريق أو الجمعية",pNameTeam:"مثال: جمعية الأمل الشبابية",lEvent:"اسم الفعالية / المناسبة (اختياري)",pEvent:"مثال: الملتقى الوطني للشباب",lOrgLogo:"شعار مؤسستك أو جمعيتك (اختياري)",orgLogoPick:"🖼️ اختر الشعار",orgLogoDel:"✕ إزالة",teamAdd:"➕ أضف صورة أو أكثر (حتى 4 صور)",teamHint:"صورة واحدة تكفي. وإن أضفت أكثر (حتى 4) فتُرتَّب تلقائياً في كولاج داخل الإطار.",errTeam:"أضف صورة واحدة على الأقل.",copyImg:"📋 نسخ الصورة",msgImgCopy:"تم نسخ الصورة ✓ الصقها (Ctrl+V) في منشور المجموعة.",msgImgCopyFail:"تعذّر نسخ الصورة، تم تحميلها بدلاً من ذلك.",privacy:"🔒 صورتك لا تغادر جهازك: تُصمَّم الصورة داخل متصفحك فقط، ولا تُرفع ولا تُحفظ في أي خادم. نتذكّر بياناتك النصية وصورتك الأخيرة على هذا الجهاز فقط لتسهيل المرة القادمة.",clearProfile:"🗑️ مسح بياناتي المحفوظة على هذا الجهاز",msgCleared:"تم مسح البيانات المحفوظة.",pillTeam:"سعداء بوجودنا بينكم",
- lastPhoto:"↩︎ صورتي الأخيرة",lTxt:"النص على الصورة",txtShow:"إظهار النص (الاسم والبيانات)",txtGrad:"تظليل خلف النص",txtReset:"↺ إعادة",txtEdit:"✏️ تعديل الاسم والبيانات",txtHint:"اسحب النص فوق الصورة لتحريكه، أو استعمل ▲ ▼ و＋ －، واختر اللون، أو أخفِه كلياً.",flagTitle:"جزائري وأفتخر",
+ lastPhoto:"↩︎ صورتي الأخيرة",lTxt:"النص على الصورة (الاسم والبيانات)",txtShow:"إظهار النص (الاسم والبيانات)",txtGrad:"تظليل خلف النص",txtReset:"↺ إعادة",txtEdit:"✏️ تعديل الاسم والبيانات",txtHint:"اسحب النص فوق الصورة لتحريكه، أو استعمل ▲ ▼ و＋ －، واختر اللون، أو أخفِه كلياً.",flagTitle:"جزائري وأفتخر",
  lStk:"ملصقات (اختياري)",stkHint:"اضغط لإضافة ملصق ثم اسحبه فوق الصورة. ＋ و － لتغيير الحجم، 🗑 للحذف.",
  enh:"✨ تحسين الإضاءة والألوان تلقائياً",hintTxt:"👋 أهلاً بك! ثلاث خطوات بسيطة: ① أدخل بياناتك ② اختر القالب وأضف صورتك ③ أنشئ الصورة وشاركها في المجموعة.",hintOk:"فهمت ✓",
  newBtn:"🔄 جديد (العودة للصفحة الرئيسية)",
@@ -768,9 +768,10 @@ function header(T){
 
 const STK=[["flag",{ar:"علم الجزائر",fr:"Drapeau",en:"Flag"}],["medal",{ar:"ميدالية",fr:"Médaille",en:"Medal"}],["star",{ar:"نجمة",fr:"Étoile",en:"Star"}],["heart",{ar:"قلب",fr:"Cœur",en:"Heart"}],["crown",{ar:"تاج",fr:"Couronne",en:"Crown"}]];
 let stks=[],stkSel=-1,sdrag=null;
-const TXT0={show:true,grad:true,color:"#ffffff",dx:0,dy:0,s:1};let txt={...TXT0},txtRect=null,tdrag=null;
-const TCOL=["#ffffff","#ffd23f","#111827","#d21034","#0f8a44"];
-function txtUI(){$("txtColors").innerHTML=TCOL.map(c=>`<span class="chip${c===txt.color?" on":""}" data-c="${c}" style="background:${c};min-width:44px;height:36px;padding:0;border:3px solid ${c===txt.color?"#ff5a36":"#ccc"}"></span>`).join("");
+const TXT0={show:true,grad:true,color:"auto",dx:0,dy:0,s:1};
+const tc=d=>txt.color==="auto"?d:txt.color;let txt={...TXT0},txtRect=null,tdrag=null;
+const TCOL=["auto","#ffffff","#ffd23f","#111827","#d21034","#0f8a44"];
+function txtUI(){$("txtColors").innerHTML=TCOL.map(c=>`<span class="chip${c===txt.color?" on":""}" data-c="${c}" style="${c==="auto"?"":"background:"+c+";"}min-width:44px;height:36px;padding:0 8px;border:3px solid ${c===txt.color?"#ff5a36":"#ccc"}">${c==="auto"?"A":""}</span>`).join("");
   $("txtShow").checked=txt.show;$("txtGrad").checked=txt.grad}
 $("txtColors").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;txt.color=c.dataset.c;txtUI();draw();renderThumbs()};
 $("txtShow").onchange=e=>{txt.show=e.target.checked;draw();renderThumbs()};
@@ -884,7 +885,7 @@ function plate(T){
   ctx.fill();ctx.restore();
   if(P.border){ctx.lineWidth=P.border[0];ctx.strokeStyle=fillOf(P.border[1],x,y,x+w,y+h);ctx.stroke()}
   const nm=data.name||t("imgName"),sz=fit(nm,w-170,68,800,34);
-  ctx.fillStyle=P.tx;ctx.textAlign="center";ctx.fillText(nm,W/2,y+h/2+sz*.34);
+  ctx.fillStyle=tc(P.tx);ctx.textAlign="center";ctx.fillText(nm,W/2,y+h/2+sz*.34);
   if(T.orn){sparkle(x+62,y+h/2,15,T.orn);sparkle(x+w-62,y+h/2,15,T.orn)}
 }
 
@@ -902,7 +903,7 @@ function lineFlag(txt,y){
   else if(useEmo){ctx.save();ctx.textAlign="left";ctx.font="34px sans-serif";ctx.fillText(flagEmoji(data.country),fx,y+2);ctx.restore()}
 }
 function texts(T){
-  ctx.textAlign="center";ctx.fillStyle=T.sub;ctx.font="600 36px Cairo,Tahoma,sans-serif";
+  ctx.textAlign="center";ctx.fillStyle=tc(T.sub);ctx.font="600 36px Cairo,Tahoma,sans-serif";
   const roles=data.roles.map(roleLabel).filter(Boolean).join(" • ");
   const isDZ=data.country==="DZ",wil=isDZ&&data.wil>=0?t("wil")+wname(data.wil):cname(data.country);
   const l2=[roles,wil].filter(Boolean).join("  |  ");
@@ -916,7 +917,7 @@ function pillDraw(T){
   ctx.textAlign="center";ctx.font="700 32px Cairo,Tahoma,sans-serif";
   const pw=Math.min(980,ctx.measureText(ptxt).width+110),py=1256;
   ctx.save();sh("rgba(0,0,0,.3)",20,8);ctx.fillStyle=fillOf(T.pill.fill,W/2-pw/2,py,W/2+pw/2,py+60);rr(W/2-pw/2,py,pw,60,30);ctx.fill();ctx.restore();
-  ctx.fillStyle=T.pill.tx;ctx.fillText(ptxt,W/2,py+41,pw-56);
+  ctx.fillStyle=tc(T.pill.tx);ctx.fillText(ptxt,W/2,py+41,pw-56);
   if(T.orn){sparkle(W/2-pw/2-32,py+30,15,T.orn);sparkle(W/2+pw/2+32,py+30,15,T.orn)}
 }
 
@@ -926,6 +927,12 @@ function infoL2(){
   const isDZ=data.country==="DZ",wil=isDZ&&data.wil>=0?t("wil")+wname(data.wil):cname(data.country);
   return [roles,wil].filter(Boolean).join("  |  ");
 }
+function txtT(py,base,fn){
+  if(ctx===mainCtx&&!T_isArt()){const k=txt.s;txtRect=txt.show?{x:540+txt.dx+(base.x-540)*k,y:py+txt.dy+(base.y-py)*k,w:base.w*k,h:base.h*k}:null}
+  if(!txt.show)return;
+  ctx.save();ctx.translate(540+txt.dx,py+txt.dy);ctx.scale(txt.s,txt.s);ctx.translate(-540,-py);fn();ctx.restore();
+}
+const T_isArt=()=>TPLS[tpl]&&TPLS[tpl].layout==="art";
 function posterBack(T){
   const PB=isTeam()?{x:0,y:250,w:W,h:800}:{x:0,y:0,w:W,h:H};
   ctx.save();ctx.beginPath();ctx.rect(PB.x,PB.y,PB.w,PB.h);ctx.clip();photoInto(PB,"round");ctx.restore();
@@ -936,9 +943,10 @@ function posterBack(T){
 }
 function posterFront(T){
   const nm=data.name||t("imgName");
-  ctx.save();sh("rgba(0,0,0,.6)",26,6);ctx.fillStyle="#ffffff";ctx.textAlign="center";const sz=fit(nm,940,100,800,40);ctx.fillText(nm,W/2,1100);ctx.restore();
-  ctx.fillStyle=T.acc||"#e6b93c";ctx.beginPath();ctx.roundRect(W/2-90,1122,180,8,4);ctx.fill();
-  texts(T);
+  txtT(1200,{x:60,y:1000,w:960,h:330},()=>{
+    ctx.save();sh("rgba(0,0,0,.6)",26,6);ctx.fillStyle=tc("#ffffff");ctx.textAlign="center";const sz=fit(nm,940,100,800,40);ctx.fillText(nm,W/2,1100);ctx.restore();
+    ctx.fillStyle=T.acc||"#e6b93c";ctx.beginPath();ctx.roundRect(W/2-90,1122,180,8,4);ctx.fill();
+    texts(T)});
   orgBadge(150,350);
 }
 function polaroid(T){
@@ -948,16 +956,17 @@ function polaroid(T){
   ctx.save();ctx.beginPath();ctx.roundRect(PB.x,PB.y,PB.w,PB.h,6);ctx.clip();photoInto(PB,"round");ctx.restore();
   ctx.save();ctx.strokeStyle="rgba(0,0,0,.12)";ctx.lineWidth=3;ctx.strokeRect(PB.x,PB.y,PB.w,PB.h);ctx.restore();
   [[215,262,-.55],[865,262,.55]].forEach(q=>{ctx.save();ctx.translate(q[0],q[1]);ctx.rotate(q[2]);ctx.fillStyle="rgba(255,226,140,.82)";ctx.fillRect(-80,-22,160,44);ctx.strokeStyle="rgba(0,0,0,.06)";ctx.strokeRect(-80,-22,160,44);ctx.restore()});
-  const nm=data.name||t("imgName");ctx.textAlign="center";ctx.fillStyle=T.acc||"#0f3d6e";fit(nm,660,60,800,30);ctx.fillText(nm,540,1042);
-  ctx.fillStyle="#555566";ctx.font="600 30px Cairo,Tahoma,sans-serif";let y=1086;
+  const nm=data.name||t("imgName");
+  txtT(1160,{x:160,y:990,w:760,h:300},()=>{
+  ctx.textAlign="center";ctx.fillStyle=tc(T.acc||"#0f3d6e");fit(nm,660,60,800,30);ctx.fillText(nm,540,1042);
+  ctx.fillStyle=tc("#555566");ctx.font="600 30px Cairo,Tahoma,sans-serif";let y=1086;
   if(data.work){ctx.fillText(data.work,540,y,660);y+=42}
-  lineFlag(infoL2(),y);
+  lineFlag(infoL2(),y);pillDraw(T)});
   ctx.save();sh("rgba(0,0,0,.3)",14,5);ctx.fillStyle="#ffffff";ctx.beginPath();ctx.arc(880,300,46,0,7);ctx.fill();ctx.restore();
   ctx.fillStyle=T.badge;ctx.beginPath();ctx.arc(880,300,38,0,7);ctx.fill();
   ctx.strokeStyle="#ffffff";ctx.lineWidth=9;ctx.lineCap="round";ctx.lineJoin="round";ctx.beginPath();ctx.moveTo(864,301);ctx.lineTo(876,313);ctx.lineTo(898,288);ctx.stroke();
   orgBadge(200,300);
   ctx.restore();
-  pillDraw(T);
 }
 function ribbonPlate(T){
   const P=T.plate,y=1010,h=104,x=100,w=880;
@@ -968,7 +977,7 @@ function ribbonPlate(T){
     ctx.beginPath();ctx.moveTo(bx,y+h);ctx.lineTo(bx+d*30,y+h);ctx.lineTo(bx+d*30,y+h+30);ctx.closePath();ctx.fill()});
   ctx.save();sh("rgba(0,0,0,.38)",30,10);ctx.fillStyle=fillOf(P.fill,x,y,x,y+h);ctx.fillRect(x,y,w,h);ctx.restore();
   ctx.lineWidth=3;ctx.strokeStyle=fillOf(P.border?P.border[1]:"#fff",x,y,x+w,y+h);ctx.beginPath();ctx.moveTo(x,y+8);ctx.lineTo(x+w,y+8);ctx.moveTo(x,y+h-8);ctx.lineTo(x+w,y+h-8);ctx.stroke();
-  const nm=data.name||t("imgName"),sz=fit(nm,w-150,66,800,34);ctx.fillStyle=P.tx;ctx.textAlign="center";ctx.fillText(nm,W/2,y+h/2+sz*.34);
+  const nm=data.name||t("imgName"),sz=fit(nm,w-150,66,800,34);ctx.fillStyle=tc(P.tx);ctx.textAlign="center";ctx.fillText(nm,W/2,y+h/2+sz*.34);
   if(T.orn){sparkle(x+62,y+h/2,15,T.orn);sparkle(x+w-62,y+h/2,15,T.orn)}
 }
 function flagBack(T){
@@ -1006,14 +1015,14 @@ function artScene(T){
   ctx.save();ctx.translate(cx+txt.dx,ycen+txt.dy);ctx.scale(k,k);ctx.translate(-cx,-ycen);
   if(txt.show&&txt.grad){const g=ctx.createLinearGradient(0,top,0,bot+40);g.addColorStop(0,"rgba(4,12,30,0)");g.addColorStop(.3,"rgba(4,12,30,.8)");g.addColorStop(.85,"rgba(4,12,30,.86)");g.addColorStop(1,"rgba(4,12,30,.5)");ctx.fillStyle=g;ctx.fillRect(PB.x-200,top,PB.w+400,bot+40-top)}
   if(txt.show){
-    const dark=txt.color==="#111827",shc=dark?"rgba(255,255,255,.75)":"rgba(0,0,0,.7)";
+    const tcol=txt.color==="auto"?"#ffffff":txt.color,dark=tcol==="#111827",shc=dark?"rgba(255,255,255,.75)":"rgba(0,0,0,.7)";
     ctx.textAlign="center";
-    ctx.save();sh(shc,14,3);ctx.fillStyle=txt.color;fit(nm,chordW(A,yN),70,800,30);ctx.fillText(nm,cx,yN);ctx.restore();
-    ctx.fillStyle=txt.color;ctx.font="600 32px Cairo,Tahoma,sans-serif";let yy=yN+46;
+    ctx.save();sh(shc,14,3);ctx.fillStyle=tcol;fit(nm,chordW(A,yN),70,800,30);ctx.fillText(nm,cx,yN);ctx.restore();
+    ctx.fillStyle=tcol;ctx.font="600 32px Cairo,Tahoma,sans-serif";let yy=yN+46;
     if(hasW){ctx.save();sh(shc,10,2);ctx.fillText(data.work,cx,yy,chordW(A,yy));ctx.restore();yy+=44}
     ctx.font="600 30px Cairo,Tahoma,sans-serif";ctx.save();sh(shc,10,2);lineFlag(l2,yy);ctx.restore();
     const ph=data.custom||(data.slogan>=0?sloganTxt(SLOGANS[data.slogan]):"");
-    if(ph){ctx.save();sh(shc,10,2);ctx.fillStyle=txt.color==="#ffd23f"?"#ffffff":"#ffd23f";if(dark)ctx.fillStyle="#d21034";ctx.font="700 30px Cairo,Tahoma,sans-serif";ctx.fillText(ph,cx,yN-(circ?66:70),chordW(A,yN-66));ctx.restore()}
+    if(ph){ctx.save();sh(shc,10,2);ctx.fillStyle=tcol==="#ffd23f"?"#ffffff":"#ffd23f";if(dark)ctx.fillStyle="#d21034";ctx.font="700 30px Cairo,Tahoma,sans-serif";ctx.fillText(ph,cx,yN-(circ?66:70),chordW(A,yN-66));ctx.restore()}
   }
   ctx.restore();
   if(ctx===mainCtx)txtRect=txt.show?{x:cx+txt.dx-(bw*.46)*k,y:ycen+txt.dy-(ycen-top+20)*k,w:bw*.92*k,h:(bot-top+40)*k}:null;
@@ -1038,12 +1047,12 @@ function scene(c,ti,sc){
   else if(T.layout==="flag"){flagBack(T);header(T);flagFront(T)}
   else if(T.layout==="poster"){posterBack(T);header(T);posterFront(T);eventRibbon(T)}
   else if(T.layout==="polaroid"){header(T);polaroid(T);eventRibbon(T)}
-  else if(T.layout==="ribbon"){header(T);frame(T);eventRibbon(T);ribbonPlate(T);texts(T)}
-  else{header(T);frame(T);eventRibbon(T);plate(T);texts(T)}
+  else if(T.layout==="ribbon"){header(T);frame(T);eventRibbon(T);txtT(1164,{x:40,y:1000,w:1000,h:330},()=>{ribbonPlate(T);texts(T)})}
+  else{header(T);frame(T);eventRibbon(T);txtT(1164,{x:90,y:1000,w:900,h:330},()=>{plate(T);texts(T)})}
   drawStickers();
   ctx.restore();ctx=prev;SC=1;
 }
-function draw(){mainCtx.setTransform(1,0,0,1,0,0);scene(mainCtx,tpl,1);$("txtCtl").classList.toggle("hidden",TPLS[tpl].layout!=="art")}
+function draw(){mainCtx.setTransform(1,0,0,1,0,0);scene(mainCtx,tpl,1);$("txtGradRow").classList.toggle("hidden",TPLS[tpl].layout!=="art")}
 function renderThumbs(){document.querySelectorAll("#tpls canvas").forEach((c,i)=>{const k=c.getContext("2d"),s=c.width/W;k.setTransform(s,0,0,s,0,0);k.clearRect(0,0,W,H);scene(k,i,s)})}
 
 document.fonts.load("800 40px Cairo").then(()=>document.fonts.ready).then(()=>{draw();renderThumbs()}).catch(()=>{});
@@ -1074,7 +1083,7 @@ const setO=(a,b)=>{if(isTeam()){const m=timgs[tsel],r=cellRects[tsel];if(!m)retu
 const setZoom=z=>{z=Math.max(1,Math.min(3,z));if(isTeam()){const m=timgs[tsel];if(m)m._z=z}else zoom=z;$("zoom").value=z;draw()};
 cv.addEventListener("pointerdown",e=>{
   const hi=stkHit(e);if(hi>=0){stkSel=hi;sdrag={i:hi,x:e.clientX,y:e.clientY,sx:stks[hi].x,sy:stks[hi].y};cv.setPointerCapture(e.pointerId);stkUI();draw();return}
-  if(TPLS[tpl].layout==="art"&&txtRect){const r0=cv.getBoundingClientRect(),k0=cv.width/r0.width,x0=(e.clientX-r0.left)*k0,y0=(e.clientY-r0.top)*k0;
+  if(txtRect){const r0=cv.getBoundingClientRect(),k0=cv.width/r0.width,x0=(e.clientX-r0.left)*k0,y0=(e.clientY-r0.top)*k0;
     if(x0>=txtRect.x&&x0<=txtRect.x+txtRect.w&&y0>=txtRect.y&&y0<=txtRect.y+txtRect.h){tdrag={x:e.clientX,y:e.clientY,dx:txt.dx,dy:txt.dy};cv.setPointerCapture(e.pointerId);return}}
   if(isTeam()&&timgs.length>1&&ptrs.size===0){const r=cv.getBoundingClientRect(),k=cv.width/r.width,x=(e.clientX-r.left)*k,y=(e.clientY-r.top)*k;
     const c=cellRects.findIndex(q=>x>=q[0]&&x<=q[0]+q[2]&&y>=q[1]&&y<=q[1]+q[3]);if(c>=0&&c!==tsel){tsel=c;$("zoom").value=getZ();drawTeamThumbs();draw()}}
