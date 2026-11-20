@@ -730,7 +730,7 @@ tech(){ctx.fillStyle=gl([[0,"#030816"],[.6,"#071a33"],[1,"#04101f"]],0,0,0,H);ct
   stars(3,50,0,H,"#7fe3ff");vignette(.35);grain(.05)},
 track(){ctx.fillStyle=gl([[0,"#b83a14"],[.5,"#e0561f"],[1,"#8c2a0c"]],0,0,0,H);ctx.fillRect(0,0,W,H);
   glow(900,200,700,"#ffb347",.4);
-  ctx.save();for(let i=0;i<9;i++){ctx.strokeStyle=i%2?"rgba(255,255,255,.55)":"rgba(255,255,255,.9)";ctx.lineWidth=i%2?3:5;ctx.beginPath();ctx.ellipse(AR?-200:1280,1500,900-i*0+i*0+(i*95),1300-i*20+i*95-i*95,0,Math.PI,Math.PI*1.5);ctx.stroke()}ctx.restore();
+  ctx.save();for(let i=0;i<9;i++){ctx.strokeStyle=i%2?"rgba(255,255,255,.55)":"rgba(255,255,255,.9)";ctx.lineWidth=i%2?3:5;ctx.beginPath();ctx.ellipse(AR?-200:1280,1500,900-i*0+i*0+(i*95),1300-i*20+i*95-i*95,0,AR?Math.PI*1.5:Math.PI,AR?Math.PI*2:Math.PI*1.5);ctx.stroke()}ctx.restore();
   ctx.save();ctx.strokeStyle="rgba(255,255,255,.14)";ctx.lineWidth=4;for(let i=0;i<7;i++){ctx.beginPath();ctx.moveTo(-50,260+i*120);ctx.lineTo(W+50,140+i*120);ctx.stroke()}ctx.restore();
   ctx.fillStyle="rgba(20,6,0,.45)";ctx.fillRect(0,1000,W,350);glow(540,1200,600,"#000000",.25);
   [[100,330,20],[985,520,24]].forEach(q=>sparkle(q[0],q[1],q[2],"#ffffff",.9));vignette(.38);grain(.07)},
@@ -900,7 +900,7 @@ function plate(T){
   ctx.fill();ctx.restore();
   if(P.border){ctx.lineWidth=P.border[0];ctx.strokeStyle=fillOf(P.border[1],x,y,x+w,y+h);ctx.stroke()}
   const nm=data.name||t("imgName"),sz=fit(nm,w-170,68,800,34);
-  ctx.fillStyle=tc(P.tx);ctx.textAlign="center";ctx.fillText(nm,W/2,y+h/2+sz*.34);
+  ctx.fillStyle=tc(P.tx);ctx.textAlign="center";ctx.fillText(nm,W/2,y+h/2+sz*(AR?.25:.34));
   if(T.orn){sparkle(x+62,y+h/2,15,T.orn);sparkle(x+w-62,y+h/2,15,T.orn)}
 }
 
@@ -992,7 +992,7 @@ function ribbonPlate(T){
     ctx.beginPath();ctx.moveTo(bx,y+h);ctx.lineTo(bx+d*30,y+h);ctx.lineTo(bx+d*30,y+h+30);ctx.closePath();ctx.fill()});
   ctx.save();sh("rgba(0,0,0,.38)",30,10);ctx.fillStyle=fillOf(P.fill,x,y,x,y+h);ctx.fillRect(x,y,w,h);ctx.restore();
   ctx.lineWidth=3;ctx.strokeStyle=fillOf(P.border?P.border[1]:"#fff",x,y,x+w,y+h);ctx.beginPath();ctx.moveTo(x,y+8);ctx.lineTo(x+w,y+8);ctx.moveTo(x,y+h-8);ctx.lineTo(x+w,y+h-8);ctx.stroke();
-  const nm=data.name||t("imgName"),sz=fit(nm,w-150,66,800,34);ctx.fillStyle=tc(P.tx);ctx.textAlign="center";ctx.fillText(nm,W/2,y+h/2+sz*.34);
+  const nm=data.name||t("imgName"),sz=fit(nm,w-150,66,800,34);ctx.fillStyle=tc(P.tx);ctx.textAlign="center";ctx.fillText(nm,W/2,y+h/2+sz*(AR?.25:.34));
   if(T.orn){sparkle(x+62,y+h/2,15,T.orn);sparkle(x+w-62,y+h/2,15,T.orn)}
 }
 function flagBack(T){
@@ -1070,7 +1070,9 @@ function scene(c,ti,sc){
 function draw(){mainCtx.setTransform(1,0,0,1,0,0);scene(mainCtx,tpl,1);$("txtGradRow").classList.toggle("hidden",TPLS[tpl].layout!=="art")}
 function renderThumbs(){document.querySelectorAll("#tpls canvas").forEach((c,i)=>{const k=c.getContext("2d"),s=c.width/W;k.setTransform(s,0,0,s,0,0);k.clearRect(0,0,W,H);scene(k,i,s)})}
 
-document.fonts.load("800 40px Cairo").then(()=>document.fonts.ready).then(()=>{draw();renderThumbs()}).catch(()=>{});
+{const smp="ديوان قطاع الشباب والرياضة محمد ولاية أنا جزء من المجتمع 0123 Diwan Jeunesse";
+const ld=()=>Promise.all(["400","600","700","800"].map(w=>document.fonts.load(w+" 40px Cairo",smp))).then(()=>document.fonts.ready).then(()=>{draw();renderThumbs()}).catch(()=>{});
+ld();setTimeout(ld,2500)}
 
 $("pick").onclick=()=>$("file").click();
 cv.onclick=()=>{if(isTeam()){if(timgs.length<4)$("teamFile").click()}else if(!img)$("file").click()};
