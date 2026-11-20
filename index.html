@@ -3,14 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0f3d6e">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="الديوان">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" href="icon-192.png">
 <title>ديوان قطاع الشباب والرياضة</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -123,8 +115,6 @@ aside h1{font-size:20px;margin:14px 0 10px}.steps{flex-direction:row}.step{flex:
   <div class="err" id="e1"></div>
   <button class="btn" id="to2" data-i="next"></button>
   <button type="button" class="linkbtn" id="clearProf" data-i="clearProfile"></button>
-  <button type="button" class="btn sec hidden" id="installBtn" data-i="installApp" style="margin-top:14px"></button>
-  <div class="ok hidden" id="iosHint" style="font-size:13px;margin-top:14px" data-i="iosHint"></div>
 </section>
 
 <section id="s2" class="card hidden">
@@ -132,8 +122,7 @@ aside h1{font-size:20px;margin:14px 0 10px}.steps{flex-direction:row}.step{flex:
   <label style="margin-top:0" data-i="lTpl"></label>
   <div class="tpls" id="tpls"></div>
   <canvas id="cv" width="1080" height="1350"></canvas>
-  <div id="zoomWrap"><label data-i="lZoom"></label><input type="range" id="zoom" min="0.3" max="3" step="0.01" value="1"></div>
-  <div class="row" id="fitRow" style="gap:8px;margin-top:8px"><button type="button" class="btn sec" id="fitIn" data-i="fitIn" style="padding:10px 12px;font-size:14px"></button><button type="button" class="btn sec" id="fitFill" data-i="fitFill" style="padding:10px 12px;font-size:14px"></button></div>
+  <div id="zoomWrap"><label data-i="lZoom"></label><input type="range" id="zoom" min="1" max="3" step="0.01" value="1"></div>
   <label data-i="lStk"></label><div class="chips" id="stkChips"></div>
   <div class="row hidden" id="stkCtl"><button class="btn sec" id="stkBig" style="padding:10px">＋</button><button class="btn sec" id="stkSmall" style="padding:10px">－</button><button class="btn sec" id="stkDel" style="padding:10px">🗑</button></div>
   <p class="sub" style="margin:6px 0 0;font-size:12px" data-i="stkHint"></p>
@@ -328,12 +317,12 @@ ar:{org:CONFIG.ORG_AR,brandSub:"",h1:"شارك صورتك مع مجموعة ال
  lCountry:"الدولة",lWilaya:"الولاية",pickW:"اختر الولاية",lAge:"الفئة العمرية",lGender:"الجنس (اختياري)",pickAge:"اختر",lRole:"صفتك (اختياري)",
  lWork:"مكان العمل / المؤسسة / الجمعية (اختياري)",pWork:"مثال: جمعية الأمل الشبابية",pOther:"اكتب صفتك (مثال: صحفي، طالب، فنان)",lCustom:"أو اكتب كلمة / جملة قصيرة بنفسك (اختياري)",pCustom:"مثال: أحب وطني وأخدمه",lSlogan:"عبارة على الصورة (اختياري)",noSlogan:"بدون عبارة",
  consent:"أوافق على استعمال اسمي وصورتي لإنشاء الصورة ونشرها في مجموعة ديوان قطاع الشباب والرياضة.",next:"التالي ←",
- c2h:"أضف صورتك",c2sub:"اختر القالب ثم الصورة، وحرّكها بإصبعك أو الفأرة واضبط الحجم.",lTpl:"اختر القالب",lZoom:"تكبير / تصغير",fitIn:"▣ ملاءمة الإطار (الصورة كاملة)",fitFill:"⛶ ملء الإطار",
+ c2h:"أضف صورتك",c2sub:"اختر القالب ثم الصورة، وحرّكها بإصبعك أو الفأرة واضبط الحجم.",lTpl:"اختر القالب",lZoom:"تكبير / تصغير",
  pick:"📷 اختر صورة",pick2:"📷 تغيير الصورة",back:"→ رجوع",make:"إنشاء الصورة ←",
  c3h:"شكراً لك! 🎉",c3sub:"صورتك جاهزة للمشاركة في مجموعة الديوان.",back2:"تغيير الصورة",dl:"⬇ تحميل",share:"مشاركة",openGroup:"فتح مجموعة الديوان على فيسبوك",
  postHint:"انشر الصورة في المجموعة مع التعليق والوسوم:",copy:"نسخ التعليق والوسوم",
  lMode:"نوع المشاركة",modeSolo:"👤 صورة شخصية",modeTeam:"👥 صورة فريق / جمعية",lNameTeam:"اسم الفريق أو الجمعية",pNameTeam:"مثال: جمعية الأمل الشبابية",lEvent:"اسم الفعالية / المناسبة (اختياري)",pEvent:"مثال: الملتقى الوطني للشباب",lOrgLogo:"شعار مؤسستك أو جمعيتك (اختياري)",orgLogoPick:"🖼️ اختر الشعار",orgLogoDel:"✕ إزالة",teamAdd:"➕ أضف صورة أو أكثر (حتى 4 صور)",teamHint:"صورة واحدة تكفي. وإن أضفت أكثر (حتى 4) فتُرتَّب تلقائياً في كولاج داخل الإطار.",errTeam:"أضف صورة واحدة على الأقل.",copyImg:"📋 نسخ الصورة",msgImgCopy:"تم نسخ الصورة ✓ الصقها (Ctrl+V) في منشور المجموعة.",msgImgCopyFail:"تعذّر نسخ الصورة، تم تحميلها بدلاً من ذلك.",privacy:"🔒 صورتك لا تغادر جهازك: تُصمَّم الصورة داخل متصفحك فقط، ولا تُرفع ولا تُحفظ في أي خادم. نتذكّر بياناتك النصية وصورتك الأخيرة على هذا الجهاز فقط لتسهيل المرة القادمة.",clearProfile:"🗑️ مسح بياناتي المحفوظة على هذا الجهاز",msgCleared:"تم مسح البيانات المحفوظة.",pillTeam:"سعداء بوجودنا بينكم",
- lastPhoto:"↩︎ صورتي الأخيرة",installApp:"📲 ثبّت الموقع كتطبيق على هاتفك",iosHint:"📲 على آيفون: اضغط زر المشاركة (المربع والسهم) في Safari ثم «إضافة إلى الشاشة الرئيسية» لتثبيته كتطبيق.",lTxt:"النص على الصورة (الاسم والبيانات)",txtShow:"إظهار النص (الاسم والبيانات)",txtGrad:"تظليل خلف النص",txtReset:"↺ إعادة",txtEdit:"✏️ تعديل الاسم والبيانات",txtHint:"اسحب النص فوق الصورة لتحريكه، أو استعمل ▲ ▼ و＋ －، واختر اللون، أو أخفِه كلياً.",flagTitle:"جزائري وأفتخر",
+ lastPhoto:"↩︎ صورتي الأخيرة",lTxt:"النص على الصورة (الاسم والبيانات)",txtShow:"إظهار النص (الاسم والبيانات)",txtGrad:"تظليل خلف النص",txtReset:"↺ إعادة",txtEdit:"✏️ تعديل الاسم والبيانات",txtHint:"اسحب النص فوق الصورة لتحريكه، أو استعمل ▲ ▼ و＋ －، واختر اللون، أو أخفِه كلياً.",flagTitle:"جزائري وأفتخر",
  lStk:"ملصقات (اختياري)",stkHint:"اضغط لإضافة ملصق ثم اسحبه فوق الصورة. ＋ و － لتغيير الحجم، 🗑 للحذف.",
  enh:"✨ تحسين الإضاءة والألوان تلقائياً",hintTxt:"👋 أهلاً بك! ثلاث خطوات بسيطة: ① أدخل بياناتك ② اختر القالب وأضف صورتك ③ أنشئ الصورة وشاركها في المجموعة.",hintOk:"فهمت ✓",
  newBtn:"🔄 جديد (العودة للصفحة الرئيسية)",
@@ -347,12 +336,12 @@ fr:{org:CONFIG.ORG_FR,brandSub:"",h1:"Partagez votre photo avec le groupe du Diw
  lCountry:"Pays",lWilaya:"Wilaya",pickW:"Choisir la wilaya",lAge:"Tranche d'âge",lGender:"Sexe (facultatif)",pickAge:"Choisir",lRole:"Votre statut (facultatif)",
  lWork:"Lieu de travail / établissement / association (facultatif)",pWork:"Ex. : Association Al Amal",pOther:"Écrivez votre statut (ex. : journaliste, étudiant, artiste)",lCustom:"Ou écrivez votre propre mot / phrase courte (facultatif)",pCustom:"Ex. : J'aime mon pays et je le sers",lSlogan:"Phrase sur la photo (facultatif)",noSlogan:"Sans phrase",
  consent:"J'accepte que mon nom et ma photo soient utilisés pour créer l'image et la publier dans le groupe du Diwan du secteur Jeunesse et Sports.",next:"Suivant →",
- c2h:"Ajoutez votre photo",c2sub:"Choisissez le modèle puis la photo ; déplacez-la du doigt ou de la souris et réglez le zoom.",lTpl:"Choisir le modèle",lZoom:"Zoom",fitIn:"▣ Ajuster au cadre (photo entière)",fitFill:"⛶ Remplir le cadre",
+ c2h:"Ajoutez votre photo",c2sub:"Choisissez le modèle puis la photo ; déplacez-la du doigt ou de la souris et réglez le zoom.",lTpl:"Choisir le modèle",lZoom:"Zoom",
  pick:"📷 Choisir une photo",pick2:"📷 Changer la photo",back:"← Retour",make:"Créer l'image →",
  c3h:"Merci ! 🎉",c3sub:"Votre image est prête à être partagée dans le groupe du Diwan.",back2:"Changer la photo",dl:"⬇ Télécharger",share:"Partager",openGroup:"Ouvrir le groupe Facebook du Diwan",
  postHint:"Publiez l'image dans le groupe avec ce texte et ces hashtags :",copy:"Copier le texte et les hashtags",
  lMode:"Type de participation",modeSolo:"👤 Photo individuelle",modeTeam:"👥 Photo d'équipe / association",lNameTeam:"Nom de l'équipe ou de l'association",pNameTeam:"Ex. : Association Al Amal",lEvent:"Nom de l'événement (facultatif)",pEvent:"Ex. : Rencontre nationale de la jeunesse",lOrgLogo:"Logo de votre structure (facultatif)",orgLogoPick:"🖼️ Choisir le logo",orgLogoDel:"✕ Retirer",teamAdd:"➕ Ajouter une ou plusieurs photos (jusqu'à 4)",teamHint:"Une seule photo suffit. Si vous en ajoutez plusieurs (jusqu'à 4), elles forment un collage dans le cadre.",errTeam:"Ajoutez au moins une photo.",copyImg:"📋 Copier l'image",msgImgCopy:"Image copiée ✓ Collez-la (Ctrl+V) dans la publication du groupe.",msgImgCopyFail:"Copie impossible : l'image a été téléchargée.",privacy:"🔒 Votre photo ne quitte pas votre appareil : l'image est créée dans votre navigateur, sans envoi ni stockage sur un serveur. Vos données texte et votre dernière photo sont mémorisées sur cet appareil uniquement, pour gagner du temps la prochaine fois.",clearProfile:"🗑️ Effacer mes données enregistrées sur cet appareil",msgCleared:"Données enregistrées effacées.",pillTeam:"Heureux d'être parmi vous",
- lastPhoto:"↩︎ Ma dernière photo",installApp:"📲 Installer le site comme application",iosHint:"📲 Sur iPhone : touchez le bouton Partager dans Safari puis « Sur l'écran d'accueil » pour l'installer comme application.",lTxt:"Texte sur l'image",txtShow:"Afficher le texte (nom et infos)",txtGrad:"Ombre derrière le texte",txtReset:"↺ Réinit.",txtEdit:"✏️ Modifier le nom et les infos",txtHint:"Faites glisser le texte sur l'image, ou utilisez ▲ ▼ et ＋ －, choisissez la couleur ou masquez-le.",flagTitle:"Algérien et fier",
+ lastPhoto:"↩︎ Ma dernière photo",lTxt:"Texte sur l'image",txtShow:"Afficher le texte (nom et infos)",txtGrad:"Ombre derrière le texte",txtReset:"↺ Réinit.",txtEdit:"✏️ Modifier le nom et les infos",txtHint:"Faites glisser le texte sur l'image, ou utilisez ▲ ▼ et ＋ －, choisissez la couleur ou masquez-le.",flagTitle:"Algérien et fier",
  lStk:"Autocollants (facultatif)",stkHint:"Touchez pour ajouter, puis faites glisser sur la photo. ＋ et － pour la taille, 🗑 pour supprimer.",
  enh:"✨ Améliorer lumière et couleurs automatiquement",hintTxt:"👋 Bienvenue ! Trois étapes simples : ① Saisissez vos informations ② Choisissez le modèle et ajoutez votre photo ③ Créez l'image et partagez-la dans le groupe.",hintOk:"Compris ✓",
  newBtn:"🔄 Nouveau (retour à l'accueil)",
@@ -366,12 +355,12 @@ en:{org:CONFIG.ORG_EN,brandSub:"",h1:"Share your photo with the Diwan group",st1
  lCountry:"Country",lWilaya:"Wilaya",pickW:"Choose your wilaya",lAge:"Age group",lGender:"Gender (optional)",pickAge:"Choose",lRole:"Your role (optional)",
  lWork:"Workplace / institution / association (optional)",pWork:"E.g.: Al Amal Youth Association",pOther:"Write your role (e.g.: journalist, student, artist)",lCustom:"Or write your own word / short sentence (optional)",pCustom:"E.g.: I love my country and serve it",lSlogan:"Phrase on the photo (optional)",noSlogan:"No phrase",
  consent:"I agree that my name and photo may be used to create the image and publish it in the Diwan of the Youth and Sports Sector group.",next:"Next →",
- c2h:"Add your photo",c2sub:"Pick a template and a photo, then drag it with your finger or mouse and adjust the zoom.",lTpl:"Choose a template",lZoom:"Zoom",fitIn:"▣ Fit to frame (whole photo)",fitFill:"⛶ Fill the frame",
+ c2h:"Add your photo",c2sub:"Pick a template and a photo, then drag it with your finger or mouse and adjust the zoom.",lTpl:"Choose a template",lZoom:"Zoom",
  pick:"📷 Choose a photo",pick2:"📷 Change photo",back:"← Back",make:"Create image →",
  c3h:"Thank you! 🎉",c3sub:"Your image is ready to be shared in the Diwan group.",back2:"Change photo",dl:"⬇ Download",share:"Share",openGroup:"Open the Diwan Facebook group",
  postHint:"Post the image in the group with this text and hashtags:",copy:"Copy text and hashtags",
  lMode:"Participation type",modeSolo:"👤 Solo photo",modeTeam:"👥 Team / association photo",lNameTeam:"Team or association name",pNameTeam:"E.g.: Al Amal Youth Association",lEvent:"Event name (optional)",pEvent:"E.g.: National Youth Forum",lOrgLogo:"Your organization's logo (optional)",orgLogoPick:"🖼️ Choose logo",orgLogoDel:"✕ Remove",teamAdd:"➕ Add one or more photos (up to 4)",teamHint:"One photo is enough. If you add more (up to 4), they form a collage inside the frame.",errTeam:"Add at least one photo.",copyImg:"📋 Copy image",msgImgCopy:"Image copied ✓ Paste (Ctrl+V) into the group post.",msgImgCopyFail:"Couldn't copy; the image was downloaded instead.",privacy:"🔒 Your photo never leaves your device: the image is created in your browser, with nothing uploaded or stored on a server. Your text details and last photo are remembered on this device only, to save time next time.",clearProfile:"🗑️ Clear my data saved on this device",msgCleared:"Saved data cleared.",pillTeam:"Happy to be among you",
- lastPhoto:"↩︎ My last photo",installApp:"📲 Install the site as an app",iosHint:"📲 On iPhone: tap the Share button in Safari, then “Add to Home Screen” to install it as an app.",lTxt:"Text on image",txtShow:"Show text (name and details)",txtGrad:"Shadow behind text",txtReset:"↺ Reset",txtEdit:"✏️ Edit name and details",txtHint:"Drag the text on the image, or use ▲ ▼ and ＋ －, pick a color, or hide it completely.",flagTitle:"Proud Algerian",
+ lastPhoto:"↩︎ My last photo",lTxt:"Text on image",txtShow:"Show text (name and details)",txtGrad:"Shadow behind text",txtReset:"↺ Reset",txtEdit:"✏️ Edit name and details",txtHint:"Drag the text on the image, or use ▲ ▼ and ＋ －, pick a color, or hide it completely.",flagTitle:"Proud Algerian",
  lStk:"Stickers (optional)",stkHint:"Tap to add a sticker, then drag it on the photo. ＋ and － resize, 🗑 deletes.",
  enh:"✨ Auto-enhance light and colors",hintTxt:"👋 Welcome! Three simple steps: ① Enter your details ② Pick a template and add your photo ③ Create the image and share it in the group.",hintOk:"Got it ✓",
  newBtn:"🔄 New (back to home)",
@@ -828,11 +817,9 @@ function enhDraw(fn){
 function bgBlur(im){if(!im._b){const c=document.createElement("canvas"),q=24;c.width=q;c.height=Math.max(1,Math.round(q*im.height/im.width));c.getContext("2d").drawImage(im,0,0,c.width,c.height);im._b=c}return im._b}
 function coverBlur(im,x,y,w,h,dark){const bb=bgBlur(im),k=Math.max(w/bb.width,h/bb.height),bw=bb.width*k,bh=bb.height*k;
   ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.imageSmoothingEnabled=true;ctx.drawImage(bb,x+(w-bw)/2,y+(h-bh)/2,bw,bh);ctx.fillStyle="rgba(0,0,0,"+dark+")";ctx.fillRect(x,y,w,h);ctx.restore()}
-function shapeRect(PB,shape){return shape==="circle"?[PB.x+PB.w*.146,PB.y+PB.h*.125,PB.w*.7075,PB.w*.7075]:shape==="hex"?[BOX.x+150,BOX.y+90,500,640]:(shape==="arch"||shape==="horse")?[BOX.x+60,BOX.y+190,680,540]:[PB.x+20,PB.y+20,PB.w-40,PB.h-90]}
-let lastPB=null,lastShape="round";
 function collage(PB,shape){
   coverBlur(timgs[0],PB.x,PB.y,PB.w,PB.h,.45);
-  const L=shapeRect(PB,shape);
+  const L=shape==="circle"?[PB.x+PB.w*.146,PB.y+PB.h*.125,PB.w*.7075,PB.w*.7075]:shape==="hex"?[BOX.x+150,BOX.y+90,500,640]:(shape==="arch"||shape==="horse")?[BOX.x+60,BOX.y+190,680,540]:[PB.x+20,PB.y+20,PB.w-40,PB.h-90];
   const n=timgs.length,g=10,[x,y,w,h]=L,hw=(w-g)/2,hh=(h-g)/2;
   const R=n===1?[[x,y,w,h]]:n===2?[[x,y,hw,h],[x+hw+g,y,hw,h]]:n===3?[[x,y,hw,h],[x+hw+g,y,hw,hh],[x+hw+g,y+hh+g,hw,hh]]:[[x,y,hw,hh],[x+hw+g,y,hw,hh],[x,y+hh+g,hw,hh],[x+hw+g,y+hh+g,hw,hh]];
   R.forEach((r,i)=>{const im=timgs[i];
@@ -857,9 +844,7 @@ function photoInto(PB,shape){
   }else if(img&&!isTeam()){
     const odd=rot%2===1,iw=odd?img.height:img.width,ih=odd?img.width:img.height;
     const base=Math.max(PB.w/iw,PB.h/ih),sc2=base*zoom,w=iw*sc2,h=ih*sc2;
-    if(ctx===mainCtx){lastPB=PB;lastShape=shape}
-    const mx=Math.abs(w-PB.w)/2,my=Math.abs(h-PB.h)/2;ox=Math.max(-mx,Math.min(mx,ox));oy=Math.max(-my,Math.min(my,oy));
-    if(w<PB.w-1||h<PB.h-1)coverBlur(img,PB.x,PB.y,PB.w,PB.h,.3);
+    const mx=(w-PB.w)/2,my=(h-PB.h)/2;ox=Math.max(-mx,Math.min(mx,ox));oy=Math.max(-my,Math.min(my,oy));
     enhDraw(()=>{ctx.save();ctx.translate(cx+ox,cy+oy);ctx.rotate(rot*Math.PI/2);ctx.drawImage(img,-img.width*sc2/2,-img.height*sc2/2,img.width*sc2,img.height*sc2);ctx.restore()});
   }else{
     ctx.fillStyle=lin(["#3a4c86","#17213f"],0,PB.y,0,PB.y+PB.h);ctx.fillRect(PB.x,PB.y,PB.w,PB.h);
@@ -1089,28 +1074,13 @@ $("file").onchange=e=>{
 $("rotBtn").onclick=()=>{if(isTeam()){const m=timgs[tsel];if(!m)return;m._r=((m._r||0)+1)%4;m._ox=m._oy=0;draw();renderThumbs();return}if(!img)return;rot=(rot+1)%4;ox=oy=0;draw();renderThumbs()};
 $("enh").onchange=e=>{enhOn=e.target.checked;draw();renderThumbs()};
 $("zoom").oninput=e=>{if(isTeam()){const m=timgs[tsel];if(m){m._z=+e.target.value;draw()}return}zoom=+e.target.value;draw()};
-function fitPhoto(mode){
-  if(isTeam()){const m=timgs[tsel],r=cellRects[tsel];if(!m||!r)return;
-    const q=m._r||0,w0=q%2?m.height:m.width,h0=q%2?m.width:m.height;
-    m._z=mode==="in"?1:Math.max(r[2]/w0,r[3]/h0)/Math.min(r[2]/w0,r[3]/h0);m._ox=m._oy=0;$("zoom").value=Math.min(3,m._z);if(m._z>3){m._z=3;$("zoom").value=3}
-  }else{
-    if(!img||!lastPB)return;const PB=lastPB,odd=rot%2===1,iw=odd?img.height:img.width,ih=odd?img.width:img.height,base=Math.max(PB.w/iw,PB.h/ih);
-    if(mode==="fill"){zoom=1;ox=oy=0}
-    else{let s,cxo=0,cyo=0;
-      if(lastShape==="circle")s=PB.w/Math.hypot(iw,ih);
-      else if(lastShape==="round")s=Math.min(PB.w/iw,PB.h/ih);
-      else{const L=shapeRect(PB,lastShape);s=Math.min(L[2]/iw,L[3]/ih);cxo=L[0]+L[2]/2-(PB.x+PB.w/2);cyo=L[1]+L[3]/2-(PB.y+PB.h/2)}
-      zoom=Math.max(.3,Math.min(3,s/base));ox=cxo;oy=cyo}
-    $("zoom").value=zoom}
-  draw();renderThumbs()}
-$("fitIn").onclick=()=>fitPhoto("in");$("fitFill").onclick=()=>fitPhoto("fill");
 let drag=null,pinch=null;const ptrs=new Map();
 const kk=()=>cv.width/cv.getBoundingClientRect().width;
 const hasT=()=>isTeam()?!!timgs[tsel]:!!img;
 const getZ=()=>isTeam()?((timgs[tsel]&&timgs[tsel]._z)||1):zoom;
 const getO=()=>isTeam()?[(timgs[tsel]&&timgs[tsel]._ox)||0,(timgs[tsel]&&timgs[tsel]._oy)||0]:[ox,oy];
 const setO=(a,b)=>{if(isTeam()){const m=timgs[tsel],r=cellRects[tsel];if(!m)return;const lx=r?r[2]/2:300,ly=r?r[3]/2:300;m._ox=Math.max(-lx,Math.min(lx,a));m._oy=Math.max(-ly,Math.min(ly,b))}else{ox=a;oy=b}};
-const setZoom=z=>{z=Math.max(.3,Math.min(3,z));if(isTeam()){const m=timgs[tsel];if(m)m._z=z}else zoom=z;$("zoom").value=z;draw()};
+const setZoom=z=>{z=Math.max(1,Math.min(3,z));if(isTeam()){const m=timgs[tsel];if(m)m._z=z}else zoom=z;$("zoom").value=z;draw()};
 cv.addEventListener("pointerdown",e=>{
   const hi=stkHit(e);if(hi>=0){stkSel=hi;sdrag={i:hi,x:e.clientX,y:e.clientY,sx:stks[hi].x,sy:stks[hi].y};cv.setPointerCapture(e.pointerId);stkUI();draw();return}
   if(txtRect){const r0=cv.getBoundingClientRect(),k0=cv.width/r0.width,x0=(e.clientX-r0.left)*k0,y0=(e.clientY-r0.top)*k0;
@@ -1237,14 +1207,6 @@ $("newBtn").onclick=()=>{
 
 applyLang();txtUI();
 try{if(!localStorage.getItem("diwan_seen"))$("hint").classList.remove("hidden")}catch(e){$("hint").classList.remove("hidden")}
-/* PWA: تسجيل العامل وزر التثبيت (يعمل فقط عند التشغيل عبر الإنترنت وليس من ملف محلي) */
-let deferredInstall=null;
-const standalone=()=>{try{return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch(e){return false}};
-if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)){try{navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}}
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;if(!standalone())$("installBtn").classList.remove("hidden")});
-window.addEventListener("appinstalled",()=>{deferredInstall=null;$("installBtn").classList.add("hidden")});
-$("installBtn").onclick=async()=>{if(!deferredInstall)return;deferredInstall.prompt();try{await deferredInstall.userChoice}catch(e){}deferredInstall=null;$("installBtn").classList.add("hidden")};
-try{if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!standalone())$("iosHint").classList.remove("hidden")}catch(e){}
 $("hintOk").onclick=()=>{$("hint").classList.add("hidden");try{localStorage.setItem("diwan_seen","1")}catch(e){}};
 loadProfile();
 try{const ev=new URLSearchParams(location.search).get("event");if(ev)$("fEvent").value=ev.slice(0,70)}catch(e){}
